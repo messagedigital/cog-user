@@ -23,6 +23,16 @@ class User implements UserInterface
 		}
 	}
 
+	public function getID()
+	{
+
+	}
+
+	public function getName()
+	{
+
+	}
+
 	public function getForename()
 	{
 		return $this->_forname;
@@ -37,7 +47,7 @@ class User implements UserInterface
 	{
 		return $this->_email;
 	}
-	
+
 	public function getGroups()
 	{
 		/* This does nothing yet */
