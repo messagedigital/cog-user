@@ -4,6 +4,7 @@ namespace Message\User;
 
 class User implements UserInterface
 {
+	protected $_id;
 	protected $_forename;
 	protected $_surname;
 	protected $_email;
@@ -25,12 +26,12 @@ class User implements UserInterface
 
 	public function getID()
 	{
-
+		return $this->_id;
 	}
 
 	public function getName()
 	{
-
+		return $this->_forename.' '.$this->_surname;
 	}
 
 	public function getForename()
