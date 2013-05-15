@@ -18,7 +18,6 @@
 			"Message\\User": ""
 		}
 	},
-	"target-dir": "Message/User",
 	"repositories": [
 		{
 			"type": "vcs",

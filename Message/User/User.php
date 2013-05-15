@@ -18,7 +18,7 @@ class User implements UserInterface
 	{
 		foreach ($data as $property => $value) {
 			$property = '_'.$property;
-			if (isset($this->{$property})) {
+			if (property_exists($this,$property)) {
 				$this->{$property} = $value;
 			}
 		}
