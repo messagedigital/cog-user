@@ -15,7 +15,8 @@
 	},
 	"autoload": {
 		"psr-0": {
-			"Message\\User": ""
+			"Message\\User"      : "src",
+			"Message\\User\\Test": "tests"
 		}
 	},
 	"repositories": [
