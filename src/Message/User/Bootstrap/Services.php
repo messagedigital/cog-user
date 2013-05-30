@@ -13,7 +13,7 @@ class Services implements ServicesInterface
 		};
 
 		$services['user.groups'] = $services->share(function() {
-			return new \Message\User\GroupCollection;
+			return new \Message\User\Group\Collection;
 		});
 	}
 }

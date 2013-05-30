@@ -1,13 +1,13 @@
 <?php
 
-namespace Message\User;
+namespace Message\User\Group;
 
 /**
  * A container for all user groups available to the system.
  *
  * @author Joe Holdcroft <joe@message.co.uk>
  */
-class GroupCollection implements \IteratorAggregate, \Countable
+class Collection implements \IteratorAggregate, \Countable
 {
 	protected $_groups = array();
 
@@ -36,12 +36,30 @@ class GroupCollection implements \IteratorAggregate, \Countable
 	public function add(GroupInterface $group)
 	{
 		if (isset($this->_groups[$group->getName()])) {
-			throw new \InvalidArgumentException(sprintf('User group `%s` already defined.', $group->getName());
+			throw new \InvalidArgumentException(sprintf('User group `%s` is already defined', $group->getName()));
 		}
 
 		$this->_groups[$group->getName()] = $group;
 
 		return $this;
+	}
+
+	/**
+	 * Get a group set on this collection by name.
+	 *
+	 * @param  string $name   The group name
+	 *
+	 * @return GroupInterface The group instance
+	 *
+	 * @throws \InvalidArgumentException If the group has not been set
+	 */
+	public function get($name)
+	{
+		if (!isset($this->_groups[$name])) {
+			throw new \InvalidArgumentException(sprintf('Group `%s` not set on collection', $name));
+		}
+
+		return $this->_groups[$name];
 	}
 
 	/**

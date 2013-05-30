@@ -1,6 +1,6 @@
 <?php
 
-namespace Message\User;
+namespace Message\User\Group;
 
 /**
  * Interface that defines a user group.
