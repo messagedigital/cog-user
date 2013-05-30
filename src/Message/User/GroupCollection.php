@@ -14,14 +14,12 @@ class GroupCollection implements \IteratorAggregate, \Countable
 	/**
 	 * Constructor.
 	 *
-	 * @param array|null $groups An array of user groups to add
+	 * @param array $groups An array of user groups to add
 	 */
-	public function __construct(array $groups = null)
+	public function __construct(array $groups = array())
 	{
-		if (is_array($groups)) {
-			foreach ($groups as $name => $group) {
-				$this->add($group);
-			}
+		foreach ($groups as $name => $group) {
+			$this->add($group);
 		}
 	}
 
@@ -31,9 +29,16 @@ class GroupCollection implements \IteratorAggregate, \Countable
 	 * @param GroupInterface $group The user group to add
 	 *
 	 * @return GroupCollection      Returns $this for chainability
+	 *
+	 * @throws \InvalidArgumentException If a group with the same name has
+	 *                                   already been set on this collection
 	 */
 	public function add(GroupInterface $group)
 	{
+		if (isset($this->_groups[$group->getName()])) {
+			throw new \InvalidArgumentException(sprintf('User group `%s` already defined.', $group->getName());
+		}
+
 		$this->_groups[$group->getName()] = $group;
 
 		return $this;

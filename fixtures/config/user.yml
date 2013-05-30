@@ -1,0 +1,1 @@
+password-hash-class: \Message\Cog\Security\Hash\Bcrypt

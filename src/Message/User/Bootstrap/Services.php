@@ -11,5 +11,9 @@ class Services implements ServicesInterface
 		$services['user'] = function() {
 			return new \Message\User\User;
 		};
+
+		$services['user.groups'] = $services->share(function() {
+			return new \Message\User\GroupCollection;
+		});
 	}
 }
