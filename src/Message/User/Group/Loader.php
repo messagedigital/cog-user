@@ -19,26 +19,35 @@ class Loader
 	/**
 	 * Constructor.
 	 *
-	 * @param Query      $query  The database query instance to use
 	 * @param Collection $groups The group collection
+	 * @param Query      $query  The database query instance to use
 	 */
-	public function __construct(DBQuery $query, Collection $groups)
+	public function __construct(Collection $groups, DBQuery $query)
 	{
-		$this->_query  = $query;
 		$this->_groups = $group;
+		$this->_query  = $query;
 	}
 
 	/**
-	 * Load a group by name.
+	 * Load group(s) by name.
 	 *
 	 * @see _load
 	 *
-	 * @param  string $name   The group name
+	 * @param  string|array $name   The group name, or an array of group names
 	 *
-	 * @return GroupInterface The group
+	 * @return array|GroupInterface The group(s)
 	 */
 	public function getByName($name)
 	{
+		if (is_array($name)) {
+			$return = array();
+			foreach ($name as $groupName) {
+				$return[$name] = $this->_load($name);
+			}
+
+			return $return;
+		}
+
 		return $this->_load($name);
 	}
 
