@@ -6,7 +6,7 @@ use Message\User\UserInterface;
 
 use Message\Cog\HTTP\Cookie;
 
-// add event to check cookie
+// @todo add event to check cookie
 
 class Authentication extends \Message\Cog\Controller\Controller
 {
@@ -16,10 +16,11 @@ class Authentication extends \Message\Cog\Controller\Controller
 	public function login()
 	{
 		// Send the user away if they are already logged in
-		if ($this->_services['http.session']->get(self::SESSION_NAME) instanceof UserInterface) {
+		if ($this->_services['http.session']->get($this->_services['cfg']->user->sessionName) instanceof UserInterface) {
 			return $this->redirect('/');
 		}
-#var_dump($this->_services['user.password_hash']->encrypt('meglily'));
+
+		// @todo remove this when router "method" matching works
 		$this->loginAction();
 
 		return $this->render('::login');
@@ -38,12 +39,15 @@ class Authentication extends \Message\Cog\Controller\Controller
 				throw new \Exception('Login details incorrect: please check and try again.');
 			}
 
-			$this->_services['http.session']->set(self::SESSION_NAME, $user);
-			// update "last login date"
-#print_r($data);exit;
+			// Set the user session
+			$this->_services['http.session']->set($this->_services['cfg']->user->sessionName, $user);
+
+			// @todo update "last login date"
+
+			// If the user selected "keep me logged in", set the user cookie
 			if (isset($data['remember']) && 1 == $data['remember']) {
 				$this->_services['http.cookies']->add(new Cookie(
-					self::COOKIE_NAME,
+					$this->_services['cfg']->user->cookieName,
 					$this->_services['user.session_hash']->generate($user),
 					new \DateTime('+' . $this->_services['cfg']->user->cookieLength)
 				));
