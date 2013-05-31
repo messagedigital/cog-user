@@ -3,6 +3,9 @@
 namespace Message\User;
 
 use Message\Cog\DB\Query as DBQuery;
+use Message\Cog\ValueObject\Authorship;
+
+use DateTime;
 
 /**
  * User loader decorator.
@@ -87,6 +90,46 @@ class Loader
 
 	protected function _load($id)
 	{
+		$result = $this->_query->run('
+			SELECT
+				user_id         AS id,
+				created_by,
+				created_at,
+				updated_by,
+				updated_at,
+				email,
+				password,
+				email_confirmed AS emailConfirmed,
+				title,
+				forename,
+				surname,
+				last_login_at   AS lastLogin
+			FROM
+				user
+			WHERE
+				user_id = ?i
+		', $id);
 
+		if (count($result) != 1) {
+			return false;
+		}
+
+		$user = new User;
+		$data = $result->first();
+
+		$result->bind($user);
+
+		if ($data->lastLogin) {
+			$user->lastLogin = new DateTime('@' . $data->lastLogin);
+		}
+
+		$user->authorship = new Authorship;
+		$user->authorship->create(new DateTime('@' . $data->created_at), $data->created_by);
+
+		if ($data->updated_at) {
+			$user->authorship->update(new DateTime('@' . $data->updated_at), $data->updated_by);
+		}
+
+		return $user;
 	}
 }
