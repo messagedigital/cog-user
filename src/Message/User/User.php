@@ -5,13 +5,16 @@ namespace Message\User;
 /**
  * A simple implementation of a basic user model.
  *
+ * Note that the `password` field is not implemented on this model. This is for
+ * security reasons. Any operations relating to user passwords should be
+ * separate.
+ *
  * @author Joe Holdcroft <joe@message.co.uk>
  */
 class User implements UserInterface
 {
 	public $id;
 	public $email;
-	public $password;
 	public $emailConfirmed;
 	public $authorship;
 

@@ -88,6 +88,14 @@ class Loader
 
 	}
 
+	/**
+	 * Load a user by their ID.
+	 *
+	 * @param  int $id        The user ID
+	 *
+	 * @return User|false     The prepared User instance, or false if the user
+	 *                        does not exist
+	 */
 	protected function _load($id)
 	{
 		$result = $this->_query->run('
@@ -98,7 +106,6 @@ class Loader
 				updated_by,
 				updated_at,
 				email,
-				password,
 				email_confirmed AS emailConfirmed,
 				title,
 				forename,
