@@ -23,5 +23,9 @@ class Services implements ServicesInterface
 		$services['user.group.loader'] = $services->share(function() {
 			return new \Message\User\Group\Loader($c['user.groups'], $c['db.query']);
 		});
+
+		$services['user.password_hash'] = $services->share(function($c) {
+			return new \Message\Cog\Security\Hash\Bcrypt($c['security.salt']);
+		});
 	}
 }
