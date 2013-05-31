@@ -47,9 +47,16 @@ class Loader
 	/**
 	 * Load user(s) by their email address.
 	 *
+	 * If a string is passed as the email address, only one result is returned
+	 * as an instance of `User`. If no result was found, `false` is returned.
+	 *
+	 * If an array of email addresses is passed, an array of results will always
+	 * be returned, even if only one result was found. The return array keys
+	 * are the email addresses, and the values are the instances of `User`.
+	 *
 	 * @param  string|array $email Email address, or an array of email addresses
 	 *
-	 * @return User|array          The user(s)
+	 * @return User|array|false    The user(s)
 	 */
 	public function getByEmail($email)
 	{
