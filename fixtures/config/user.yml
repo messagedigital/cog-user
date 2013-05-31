@@ -1,0 +1,1 @@
+cookie-length: 2 weeks # strtotime() representation of "keep me logged in" cookie expiry length

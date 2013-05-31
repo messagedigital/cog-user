@@ -27,5 +27,13 @@ class Services implements ServicesInterface
 		$services['user.password_hash'] = $services->share(function($c) {
 			return new \Message\Cog\Security\Hash\Bcrypt($c['security.salt']);
 		});
+
+		$services['user.session_hash'] = $services->share(function($c) {
+			return new \Message\User\SessionHash(
+				new \Message\Cog\Security\Hash\Bcrypt($c['security.salt']),
+				$c['user.loader'],
+				'aKDx213BZ8X25j8az34TRx'
+			);
+		});
 	}
 }

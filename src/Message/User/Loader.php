@@ -88,6 +88,20 @@ class Loader
 
 	}
 
+	public function getUserPassword(User $user)
+	{
+		$result = $this->_query->run('
+			SELECT
+				password
+			FROM
+				user
+			WHERE
+				user_id = ?i
+		', $user->id);
+
+		return $result->value() ?: false;
+	}
+
 	/**
 	 * Load a user by their ID.
 	 *
