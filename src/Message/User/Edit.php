@@ -2,6 +2,11 @@
 
 namespace Message\User;
 
+use Message\Cog\DB\Query as DBQuery;
+use Message\Cog\Event\DispatcherInterface;
+
+use DateTime;
+
 /**
  * Decorator class for editing users.
  *
@@ -37,10 +42,19 @@ class Edit
 
 	}
 
-	public function updateLastLoginTime(User $user, \DateTime $time = null)
+	/**
+	 * Update the "last login at" timestamp for a given user in the database
+	 * and the model.
+	 *
+	 * @param  User          $user The user to update
+	 * @param  DateTime|null $time The date & time to set, or null to be generated
+	 *
+	 * @return bool                True if the update was successful
+	 */
+	public function updateLastLoginTime(User $user, DateTime $time = null)
 	{
 		if (!$time) {
-			$time = new \DateTime;
+			$time = new DateTime;
 		}
 
 		$result = $this->_query->run('
