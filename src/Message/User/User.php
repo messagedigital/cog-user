@@ -22,8 +22,8 @@ class User implements UserInterface
 	public $forename;
 	public $surname;
 
-	public $signUpDate;
-	public $lastLogin;
+	public $lastLoginAt;
+	public $passwordRequestAt;
 
 	/**
 	 * {@inheritDoc}

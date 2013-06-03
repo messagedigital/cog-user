@@ -44,6 +44,7 @@ class Authentication extends \Message\Cog\Controller\Controller
 	 * @return Response The response object
 	 *
 	 * @todo Redirect the user somewhere after a successful login
+	 * @todo Implement user feedback properly
 	 */
 	public function loginAction()
 	{
@@ -77,7 +78,7 @@ class Authentication extends \Message\Cog\Controller\Controller
 			// where to redirect to now? how do we make it configurable?
 		}
 
-		// If the POST data was not sent, just render the login form.
+		// If the POST data was not sent, just render the login form
 		return $this->render('::login');
 	}
 

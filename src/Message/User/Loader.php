@@ -114,17 +114,18 @@ class Loader
 	{
 		$result = $this->_query->run('
 			SELECT
-				user_id         AS id,
+				user_id             AS id,
 				created_by,
 				created_at,
 				updated_by,
 				updated_at,
 				email,
-				email_confirmed AS emailConfirmed,
+				email_confirmed     AS emailConfirmed,
 				title,
 				forename,
 				surname,
-				last_login_at   AS lastLogin
+				last_login_at       AS lastLoginAt,
+				password_request_at AS passwordRequestAt
 			FROM
 				user
 			WHERE
@@ -140,8 +141,12 @@ class Loader
 
 		$result->bind($user);
 
-		if ($data->lastLogin) {
-			$user->lastLogin = new DateTime('@' . $data->lastLogin);
+		if ($data->lastLoginAt) {
+			$user->lastLoginAt = new DateTime('@' . $data->lastLoginAt);
+		}
+
+		if ($data->passwordRequestAt) {
+			$user->passwordRequestAt = new DateTime('@' . $data->passwordRequestAt);
 		}
 
 		$user->authorship = new Authorship;

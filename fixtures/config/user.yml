@@ -1,3 +1,5 @@
 cookie-length: 2 weeks # strtotime() representation of "keep me logged in" cookie expiry length
 session-name: cog-user
 cookie-name: cog-user
+forgotten-password-pepper: abvC84bXkD8MXs4aZ37FGx # pepper to use for forgotten password hashes (change this to invalidate all outstanding password reset requests)
+forgotten-password-expiry: 1 hour

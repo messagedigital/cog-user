@@ -69,7 +69,39 @@ class Edit
 			'userID'    => $user->id,
 		));
 
-		$user->lastLogin = $time;
+		$user->lastLoginAt = $time;
+
+		return (bool) $result->affected();
+	}
+
+	/**
+	 * Update the "password requested at" timestamp for a given user in the
+	 * database and the model.
+	 *
+	 * @param  User          $user The user to update
+	 * @param  DateTime|null $time The date & time to set, or null to be generated
+	 *
+	 * @return bool                True if the update was successful
+	 */
+	public function updatePasswordRequestTime(User $user, DateTime $time = null)
+	{
+		if (!$time) {
+			$time = new DateTime;
+		}
+
+		$result = $this->_query->run('
+			UPDATE
+				user
+			SET
+				password_request_at = :timestamp?i
+			WHERE
+				user_id = :userID?i
+		', array(
+			'timestamp' => $time->getTimestamp(),
+			'userID'    => $user->id,
+		));
+
+		$user->passwordRequestAt = $time;
 
 		return (bool) $result->affected();
 	}
