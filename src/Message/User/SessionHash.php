@@ -61,7 +61,7 @@ class SessionHash
 
 		$user = $this->_userLoader->getByID($userID);
 
-		if ($user && $hash === $this->encrypt($user)) {
+		if ($user && $hash === $this->generate($user)) {
 			return $user;
 		}
 
