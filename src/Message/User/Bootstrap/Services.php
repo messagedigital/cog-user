@@ -12,16 +12,21 @@ class Services implements ServicesInterface
 			return new \Message\User\User;
 		};
 
+		// Get the currently logged in user
+		$services['user.current'] = function($c) {
+			return $c['http.session']->get($c['cfg']->user->sessionName);
+		};
+
 		$services['user.loader'] = $services->share(function($c) {
 			return new \Message\User\Loader($c['db.query']);
 		});
 
-		$services['user.groups'] = $services->share(function() {
-			return new \Message\User\Group\Collection;
-		});
-
-		$services['user.group.loader'] = $services->share(function() {
-			return new \Message\User\Group\Loader($c['user.groups'], $c['db.query']);
+		$services['user.edit'] = $services->share(function($c) {
+			return new \Message\User\Edit(
+				$c['db.query'],
+				$c['event.dispatcher'],
+				$c['user.current']
+			);
 		});
 
 		$services['user.password_hash'] = $services->share(function($c) {
@@ -34,6 +39,14 @@ class Services implements ServicesInterface
 				$c['user.loader'],
 				'aKDx213BZ8X25j8az34TRx'
 			);
+		});
+
+		$services['user.groups'] = $services->share(function() {
+			return new \Message\User\Group\Collection;
+		});
+
+		$services['user.group.loader'] = $services->share(function() {
+			return new \Message\User\Group\Loader($c['user.groups'], $c['db.query']);
 		});
 	}
 }

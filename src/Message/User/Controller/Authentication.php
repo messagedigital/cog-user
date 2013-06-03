@@ -6,13 +6,21 @@ use Message\User\UserInterface;
 
 use Message\Cog\HTTP\Cookie;
 
-// @todo add event to check cookie
-
+/**
+ * Controller for user authentication: logging in & out.
+ *
+ * @author Joe Holdcroft <joe@message.co.uk>
+ */
 class Authentication extends \Message\Cog\Controller\Controller
 {
 	const SESSION_NAME = 'cog-user';
 	const COOKIE_NAME  = 'cog-user';
 
+	/**
+	 * Render the login form.
+	 *
+	 * @return Response The response object
+	 */
 	public function login()
 	{
 		// Send the user away if they are already logged in
@@ -26,9 +34,21 @@ class Authentication extends \Message\Cog\Controller\Controller
 		return $this->render('::login');
 	}
 
+	/**
+	 * Perform the login action.
+	 *
+	 * This checks the credentials entered into the form against the database,
+	 * and if they are correct, logs the user in by setting their session. If
+	 * the user selected "keep me logged in", the cookie is set.
+	 *
+	 * @return Response The response object
+	 *
+	 * @todo Redirect the user somewhere after a successful login
+	 */
 	public function loginAction()
 	{
 		if ($data = $this->_services['request']->get('login')) {
+			// Get the user
 			$user = $this->_services['user.loader']->getByEmail($data['email']);
 
 			// Check the user exists and the password is correct
@@ -42,7 +62,8 @@ class Authentication extends \Message\Cog\Controller\Controller
 			// Set the user session
 			$this->_services['http.session']->set($this->_services['cfg']->user->sessionName, $user);
 
-			// @todo update "last login date"
+			// Update last login date
+			$this->_services['user.edit']->updateLastLoginTime($user);
 
 			// If the user selected "keep me logged in", set the user cookie
 			if (isset($data['remember']) && 1 == $data['remember']) {
@@ -55,13 +76,32 @@ class Authentication extends \Message\Cog\Controller\Controller
 
 			// where to redirect to now? how do we make it configurable?
 		}
+
+		// If the POST data was not sent, just render the login form.
+		return $this->render('::login');
 	}
 
+	/**
+	 * Logs the currently logged in user out, clearing their session and cookie
+	 * (if set).
+	 *
+	 * @return Response The response object
+	 *
+	 * @todo Redirect the user somewhere after a successful log out
+	 */
 	public function logout()
 	{
-		$this->_services['cache']->delete($this->_services['config.loader']->getCacheKey());
-		$this->_services['http.session']->remove(self::SESSION_NAME);
+		// Clear the session
+		$this->_services['http.session']->remove($this->_services['cfg']->user->sessionName);
+		// Clear the cookie
+		$this->_services['http.cookies']->add(new Cookie(
+			$this->_services['cfg']->user->cookieName,
+			null,
+			1
+		));
 
 		// where to redirect? how to make this configurable? make it a param?
+
+		return $this->redirect('/login');
 	}
 }
