@@ -17,37 +17,22 @@ class Authentication extends \Message\Cog\Controller\Controller
 	const COOKIE_NAME  = 'cog-user';
 
 	/**
-	 * Render the login form.
-	 *
-	 * @return Response The response object
-	 */
-	public function login()
-	{
-		// Send the user away if they are already logged in
-		if ($this->_services['http.session']->get($this->_services['cfg']->user->sessionName) instanceof UserInterface) {
-			return $this->redirect('/');
-		}
-
-		// @todo remove this when router "method" matching works
-		$this->loginAction();
-
-		return $this->render('::login');
-	}
-
-	/**
-	 * Perform the login action.
+	 * Render the login form & run the log in action if the form is submitted.
 	 *
 	 * This checks the credentials entered into the form against the database,
 	 * and if they are correct, logs the user in by setting their session. If
 	 * the user selected "keep me logged in", the cookie is set.
 	 *
 	 * @return Response The response object
-	 *
-	 * @todo Redirect the user somewhere after a successful login
-	 * @todo Implement user feedback properly
 	 */
-	public function loginAction()
+	public function login($redirectURL) // /
 	{
+		// Send the user away if they are already logged in
+		if ($this->_services['http.session']->get($this->_services['cfg']->user->sessionName) instanceof UserInterface) {
+			return $this->redirect('/');
+		}
+
+		// If form is submitted
 		if ($data = $this->_services['request']->get('login')) {
 			// Get the user
 			$user = $this->_services['user.loader']->getByEmail($data['email']);
@@ -78,7 +63,6 @@ class Authentication extends \Message\Cog\Controller\Controller
 			// where to redirect to now? how do we make it configurable?
 		}
 
-		// If the POST data was not sent, just render the login form
 		return $this->render('::login');
 	}
 
