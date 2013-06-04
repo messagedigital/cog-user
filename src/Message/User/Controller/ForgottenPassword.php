@@ -2,6 +2,8 @@
 
 namespace Message\User\Controller;
 
+use Message\User\User;
+
 /**
  * Controller for requesting a password reset link & resetting passwords.
  *
@@ -9,16 +11,11 @@ namespace Message\User\Controller;
  */
 class ForgottenPassword extends \Message\Cog\Controller\Controller
 {
-	public function request($prefillEmailAddress = null)
-	{
-
-	}
-
 	/**
-	 * @todo email the user the link rather than printing it out
+	 * @todo implement email component when built
 	 * @todo implement user feedback properly (negative + positive)
 	 */
-	public function requestAction()
+	public function request($prefillEmailAddress = null)
 	{
 		if ($data = $this->_services['request']->get('password_request')) {
 			// Get the user
@@ -35,6 +32,14 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 			$hash = $this->_generateHash($user);
 
 			// Email it to the user
+			mail(
+				$data['email'],
+				'Password request token',
+				$this->generateUrl('user.password.reset', array(
+					'email' => $data['email'],
+					'hash'  => $hash,
+				), true)
+			);
 
 			// Give positive feedback
 		}
@@ -43,24 +48,26 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 		return $this->render('::password/request');
 	}
 
-	public function reset($email, $key)
+	public function reset($email, $hash)
 	{
 
 	}
 
-	public function resetAction($email, $key)
+	public function resetAction($email, $hash)
 	{
 
 	}
 
 	protected function _generateHash(User $user)
 	{
-		return $c['security.hash']->generate(
+		$hash = new \Message\Cog\Security\Hash\SHA1($this->_services['security.salt']);
+
+		return $hash->encrypt(
 			implode('-', array(
 				$user->id,
-				$user->passwordRequestAt,
+				$user->passwordRequestAt->getTimestamp(),
 			)),
-			$c['cfg']->user->forgottenPasswordPepper
+			$this->_services['cfg']->user->forgottenPasswordPepper
 		);
 	}
 }
