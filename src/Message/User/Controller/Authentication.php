@@ -3,6 +3,7 @@
 namespace Message\User\Controller;
 
 use Message\User\UserInterface;
+use Message\User\Event;
 
 use Message\Cog\HTTP\Cookie;
 
@@ -23,6 +24,8 @@ class Authentication extends \Message\Cog\Controller\Controller
 	 * and if they are correct, logs the user in by setting their session. If
 	 * the user selected "keep me logged in", the cookie is set.
 	 *
+	 * @param string $redirectURL The URL to redirect to after successful login
+	 *
 	 * @return Response The response object
 	 */
 	public function login($redirectURL = '/')
@@ -33,7 +36,7 @@ class Authentication extends \Message\Cog\Controller\Controller
 		}
 
 		// If form is submitted
-		if ($data = $this->_services['request']->get('login')) {
+		if ($data = $this->_services['http.request.master']->get('login')) {
 			// Get the user
 			$user = $this->_services['user.loader']->getByEmail($data['email']);
 
@@ -47,6 +50,12 @@ class Authentication extends \Message\Cog\Controller\Controller
 
 			// Set the user session
 			$this->_services['http.session']->set($this->_services['cfg']->user->sessionName, $user);
+
+			// Fire the user login event
+			$this->_services['event.dispatcher']->dispatch(
+				Event::LOGIN,
+				new Event($user)
+			);
 
 			// If the user selected "keep me logged in", set the user cookie
 			if (isset($data['remember']) && 1 == $data['remember']) {
@@ -69,11 +78,11 @@ class Authentication extends \Message\Cog\Controller\Controller
 	 * Logs the currently logged in user out, clearing their session and cookie
 	 * (if set).
 	 *
-	 * @return Response The response object
+	 * @param string $redirectURL The URL to redirect to after successful login
 	 *
-	 * @todo Redirect the user somewhere after a successful log out
+	 * @return Response The response object
 	 */
-	public function logout()
+	public function logout($redirectURL = '/')
 	{
 		// Clear the session
 		$this->_services['http.session']->remove($this->_services['cfg']->user->sessionName);
@@ -84,8 +93,12 @@ class Authentication extends \Message\Cog\Controller\Controller
 			1
 		));
 
-		// where to redirect? how to make this configurable? make it a param?
+		// Fire the user logout event
+		$this->_services['event.dispatcher']->dispatch(
+			Event::LOGOUT,
+			new Event($user)
+		);
 
-		return $this->redirect('/login');
+		return $this->redirect($redirectURL);
 	}
 }
