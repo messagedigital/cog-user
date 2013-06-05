@@ -3,10 +3,12 @@
 namespace Message\User\EventListener;
 
 use Message\Cog\HTTP\Cookie;
-use Message\Cog\HTTP\Event\Event as HTTPEvent;
 use Message\Cog\Event\SubscriberInterface;
 use Message\Cog\Service\ContainerAwareInterface;
 use Message\Cog\Service\ContainerInterface;
+
+use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 /**
  * Event listener for restoring a user's session.
@@ -19,11 +21,14 @@ class SessionRestore implements SubscriberInterface, ContainerAwareInterface
 
 	static public function getSubscribedEvents()
 	{
-		return array(HTTPEvent::REQUEST => array(
+		return array(KernelEvents::REQUEST => array(
 			array('restoreSessionFromCookie')
 		));
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public function setContainer(ContainerInterface $container)
 	{
 		$this->_services = $container;
@@ -35,11 +40,11 @@ class SessionRestore implements SubscriberInterface, ContainerAwareInterface
 	 *
 	 * If the cookie hash is invalid, the cookie will be deleted.
 	 *
-	 * @param  HTTPEvent $event The event instance
+	 * @param  GetResponseEvent $event The event instance
 	 *
 	 * @return boolean          True if the user was logged in, false otherwise
 	 */
-	public function restoreSessionFromCookie(HTTPEvent $event)
+	public function restoreSessionFromCookie(GetResponseEvent $event)
 	{
 		// Skip this if there is already a user logged in
 		if ($this->_services['user.current']) {

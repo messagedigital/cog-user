@@ -25,11 +25,11 @@ class Authentication extends \Message\Cog\Controller\Controller
 	 *
 	 * @return Response The response object
 	 */
-	public function login($redirectURL) // /
+	public function login($redirectURL = '/')
 	{
 		// Send the user away if they are already logged in
 		if ($this->_services['http.session']->get($this->_services['cfg']->user->sessionName) instanceof UserInterface) {
-			return $this->redirect('/');
+			return $this->redirect($redirectURL);
 		}
 
 		// If form is submitted
@@ -48,9 +48,6 @@ class Authentication extends \Message\Cog\Controller\Controller
 			// Set the user session
 			$this->_services['http.session']->set($this->_services['cfg']->user->sessionName, $user);
 
-			// Update last login date
-			$this->_services['user.edit']->updateLastLoginTime($user);
-
 			// If the user selected "keep me logged in", set the user cookie
 			if (isset($data['remember']) && 1 == $data['remember']) {
 				$this->_services['http.cookies']->add(new Cookie(
@@ -60,7 +57,9 @@ class Authentication extends \Message\Cog\Controller\Controller
 				));
 			}
 
-			// where to redirect to now? how do we make it configurable?
+			// fire user.login event!!! then make the "update last login time" a listener
+
+			return $this->redirect($redirectURL);
 		}
 
 		return $this->render('::login');

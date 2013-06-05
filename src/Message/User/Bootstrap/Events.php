@@ -12,15 +12,11 @@ use Message\Cog\Bootstrap\EventsInterface;
 class Events implements EventsInterface
 {
 	/**
-	 * {@inheritDoc}
-	 *
-	 * @todo Don't inject the service container once James' routes branch on Cog
-	 * gets merged.
+	 * {@inheritdoc}
 	 */
 	public function registerEvents($dispatcher)
 	{
-		$subscriber = new \Message\User\EventListener\SessionRestore;
-		$subscriber->setContainer(\Message\Cog\Service\Container::instance());
-		$dispatcher->addSubscriber($subscriber);
+		$dispatcher->addSubscriber(new \Message\User\EventListener\Login);
+		$dispatcher->addSubscriber(new \Message\User\EventListener\SessionRestore);
 	}
 }
