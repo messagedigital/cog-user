@@ -30,6 +30,6 @@ class User implements UserInterface
 	 */
 	public function getName()
 	{
-		return $this->_forename . ($this->_surname ? ' ' . $this->_surname : '');
+		return $this->forename . ($this->surname ? ' ' . $this->surname : '');
 	}
 }
