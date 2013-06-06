@@ -4,6 +4,7 @@ namespace Message\User;
 
 use Message\Cog\DB\Query as DBQuery;
 use Message\Cog\Event\DispatcherInterface;
+use Message\Cog\Security\Hash\HashInterface;
 
 use DateTime;
 
@@ -16,6 +17,7 @@ class Edit
 {
 	protected $_query;
 	protected $_eventDispatcher;
+	protected $_passwordHash;
 	protected $_currentUser;
 
 	/**
@@ -23,12 +25,15 @@ class Edit
 	 *
 	 * @param DBQuery             $query           The database query instance to use
 	 * @param DispatcherInterface $eventDispatcher The event dispatcher
+	 * @param HashInterface       $hash            Hash to use for user passwords
 	 * @param User|null           $user            The currently logged in user
 	 */
-	public function __construct(DBQuery $query, DispatcherInterface $eventDispatcher, User $user = null)
+	public function __construct(DBQuery $query, DispatcherInterface $eventDispatcher,
+		HashInterface $hash, User $user = null)
 	{
 		$this->_query           = $query;
 		$this->_eventDispatcher = $eventDispatcher;
+		$this->_passwordHash    = $hash;
 		$this->_currentUser     = $user;
 	}
 
@@ -37,9 +42,37 @@ class Edit
 
 	}
 
+	/**
+	 * Change the password for a given user.
+	 *
+	 * @param  User   $user        The user to change the password for
+	 * @param  string $newPassword The password in plain text
+	 *
+	 * @return bool                True if the update was successful
+	 */
 	public function changePassword(User $user, $newPassword)
 	{
+		$hashedPassword = $this->_passwordHash->encrypt($newPassword);
 
+		$user->authorship->update(new \DateTime, $this->_currentUser ? $this->_currentUser->id : null);
+
+		$result = $this->_query->run('
+			UPDATE
+				user
+			SET
+				password   = :password?s,
+				updated_at = :updatedAt?i,
+				updated_by = :updatedBy?in
+			WHERE
+				user_id = :userID?i
+		', array(
+			'userID'    => $user->id,
+			'password'  => $hashedPassword,
+			'updatedAt' => $user->authorship->updatedAt()->getTimestamp(),
+			'updatedBy' => $user->authorship->updatedBy(),
+		));
+
+		return (bool) $result->affected();
 	}
 
 	public function addToGroup(User $user, Group\GroupInterface $group)
@@ -112,6 +145,32 @@ class Edit
 		));
 
 		$user->passwordRequestAt = $time;
+
+		return (bool) $result->affected();
+	}
+
+	/**
+	 * Clear the "password requested at" timestamp for a given user.
+	 *
+	 * This will invalidate any outstanding password reset links for the user.
+	 * It is often called once the password has been successfully reset.
+	 *
+	 * @param  User   $user The user to update
+	 *
+	 * @return bool         True if the update was successful
+	 */
+	public function clearPasswordRequestTime(User $user)
+	{
+		$result = $this->_query->run('
+			UPDATE
+				user
+			SET
+				password_request_at = NULL
+			WHERE
+				user_id = ?i
+		', $user->id);
+
+		$user->passwordRequestAt = null;
 
 		return (bool) $result->affected();
 	}

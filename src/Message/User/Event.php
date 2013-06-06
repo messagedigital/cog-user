@@ -20,6 +20,9 @@ class Event extends \Message\Cog\Event\Event
 
 	const EMAIL_CONFIRMED  = 'user.email_confirmed';
 
+	const GROUP_ADD        = 'user.group.add';
+	const GROUP_REMOVE     = 'user.group.remove';
+
 	protected $_user;
 
 	/**

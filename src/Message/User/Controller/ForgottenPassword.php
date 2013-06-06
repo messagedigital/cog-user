@@ -3,6 +3,7 @@
 namespace Message\User\Controller;
 
 use Message\User\User;
+use Message\User\Event;
 
 /**
  * Controller for requesting a password reset link & resetting passwords.
@@ -81,6 +82,10 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 
 	public function reset($email, $hash, $redirectURL = '/')
 	{
+		$user = $this->get('user.loader')->getByEmail($email);
+
+		$this->_checkHash($user, $hash);
+
 		return $this->render('::password/reset', array(
 			'email'       => $email,
 			'hash'        => $hash,
@@ -90,13 +95,16 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 
 	public function resetAction($email, $hash)
 	{
+		$user = $this->get('user.loader')->getByEmail($email);
+
+		$this->_checkHash($user, $hash);
+
 		// If no form data set on request, redirect the user back to referer
 		if (!$data = $this->_services['request']->request->get('password_reset')) {
 			return $this->redirect($this->get('request')->headers->get('referer'));
 		}
 
 		// Check user exists
-		$user = $this->get('user.loader')->getByEmail($email);
 		if (!$user) {
 			throw new \Exception(sprintf('No user exists for email address `%s`', $email));
 		}
@@ -106,9 +114,11 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 			throw new \Exception('The entered passwords do not match: please try again.');
 		}
 
-		// Change the password
+		// Change the password & clear the requested timestamp
 		$this->get('user.edit')->changePassword($user, $data['password']);
+		$this->get('user.edit')->clearPasswordRequestTime($user);
 
+		// Dispatch password reset event
 		$this->get('event.dispatcher')->dispatch(
 			Event::PASSWORD_RESET,
 			new Event($user)
@@ -135,5 +145,14 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 			)),
 			$this->_services['cfg']->user->forgottenPasswordPepper
 		);
+	}
+
+	protected function _checkHash(User $user, $hash)
+	{
+		if ($hash !== $this->_generateHash($user)) {
+			throw new \Exception('Hash invalid');
+		}
+
+		return true;
 	}
 }

@@ -25,6 +25,7 @@ class Services implements ServicesInterface
 			return new \Message\User\Edit(
 				$c['db.query'],
 				$c['event.dispatcher'],
+				$c['user.password_hash'],
 				$c['user.current']
 			);
 		};
