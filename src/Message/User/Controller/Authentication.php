@@ -59,6 +59,12 @@ class Authentication extends \Message\Cog\Controller\Controller
 		// Get the user
 		$user = $this->_services['user.loader']->getByEmail($data['email']);
 
+		// Fire login attempt event
+		$this->_services['event.dispatcher']->dispatch(
+			Event::LOGIN_ATTEMPT,
+			new Event($user)
+		);
+
 		// Check the user exists and the password is correct
 		if (!$user || !$this->_services['user.password_hash']->check(
 			$data['password'],
@@ -98,6 +104,12 @@ class Authentication extends \Message\Cog\Controller\Controller
 	 */
 	public function logout($redirectURL = '/')
 	{
+		$user = $this->get('user.current');
+
+		if (!($user instanceof UserInterface)) {
+			return $this->redirect($redirectURL);
+		}
+
 		// Clear the session
 		$this->_services['http.session']->remove($this->_services['cfg']->user->sessionName);
 		// Clear the cookie

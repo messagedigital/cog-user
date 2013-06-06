@@ -9,6 +9,7 @@ namespace Message\User;
  */
 class Event extends \Message\Cog\Event\Event
 {
+	const LOGIN_ATTEMPT    = 'user.login.attempt';
 	const LOGIN            = 'user.login';
 	const LOGOUT           = 'user.logout';
 	const PASSWORD_REQUEST = 'user.password.request';
