@@ -8,9 +8,13 @@ class Routes implements RoutesInterface
 {
 	public function registerRoutes($router)
 	{
-		$router['user']->add('user.login.action', '/user/login', '::Controller:Authentication#loginAction')
+		$router['user']->setPrefix('/user');
+
+		$router['user']->add('user.login.action', '/login', '::Controller:Authentication#loginAction')
 			->setMethod('POST');
-		$router['user']->add('user.password.request.action', '/user/password/request', '::Controller:ForgottenPassword#requestAction')
+		$router['user']->add('user.password.request.action', '/password/request', '::Controller:ForgottenPassword#requestAction')
+			->setMethod('POST');
+		$router['user']->add('user.password.reset.action', '/password/reset/{email}/{hash}', '::Controller:ForgottenPassword#resetAction')
 			->setMethod('POST');
 	}
 }

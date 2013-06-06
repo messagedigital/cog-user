@@ -11,18 +11,32 @@ use Message\User\User;
  */
 class ForgottenPassword extends \Message\Cog\Controller\Controller
 {
-	public function request($email = null)
+	/**
+	 * Render the password request form.
+	 *
+	 * @param  string $resetRoute Name of the route to use for the reset link
+	 *                            emailed to the user
+	 * @param  string $email      Default email address to pre-fill the form with
+	 *
+	 * @return Response           The response object
+	 */
+	public function request($resetRoute, $email = null)
 	{
 		return $this->render('::password/request', array(
-			'email' => $email,
+			'resetRoute' => $resetRoute,
+			'email'      => $email,
 		));
 	}
 
 	/**
+	 * Run the password request action, emailing the user a secure & unique link
+	 * to use to reset their password.
+	 *
 	 * @todo implement email component when built
 	 * @todo implement user feedback properly (negative + positive)
 	 * @todo update password requested at timestamp within event listener??
-	 * @todo Pass in the route name for the reset URL to this somehow
+	 *
+	 * @return Response           The response object
 	 */
 	public function requestAction()
 	{
@@ -48,10 +62,15 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 		mail(
 			$data['email'],
 			'Password request token',
-			$this->generateUrl('user.password.reset', array(
+			$this->generateUrl($data['reset_route'], array(
 				'email' => $data['email'],
 				'hash'  => $hash,
 			), true)
+		);
+
+		$this->get('event.dispatcher')->dispatch(
+			Event::PASSWORD_REQUEST,
+			new Event($user)
 		);
 
 		// Give positive feedback
@@ -60,16 +79,49 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 		return $this->redirect($this->get('request')->headers->get('referer'));
 	}
 
-	public function reset($email, $hash)
+	public function reset($email, $hash, $redirectURL = '/')
 	{
 		return $this->render('::password/reset', array(
-			'email' => $email,
+			'email'       => $email,
+			'hash'        => $hash,
+			'redirectURL' => $redirectURL,
 		));
 	}
 
 	public function resetAction($email, $hash)
 	{
+		// If no form data set on request, redirect the user back to referer
+		if (!$data = $this->_services['request']->request->get('password_reset')) {
+			return $this->redirect($this->get('request')->headers->get('referer'));
+		}
 
+		// Check user exists
+		$user = $this->get('user.loader')->getByEmail($email);
+		if (!$user) {
+			throw new \Exception(sprintf('No user exists for email address `%s`', $email));
+		}
+
+		// Check the passwords match
+		if ($data['password'] !== $data['password_confirm']) {
+			throw new \Exception('The entered passwords do not match: please try again.');
+		}
+
+		// Change the password
+		$this->get('user.edit')->changePassword($user, $data['password']);
+
+		$this->get('event.dispatcher')->dispatch(
+			Event::PASSWORD_RESET,
+			new Event($user)
+		);
+
+		// Log the user in
+		$this->get('http.session')->set($this->get('cfg')->user->sessionName, $user);
+		$this->get('event.dispatcher')->dispatch(
+			Event::LOGIN,
+			new Event($user)
+		);
+
+		return $this->redirect($data['redirect']);
 	}
 
 	protected function _generateHash(User $user)

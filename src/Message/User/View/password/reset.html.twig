@@ -1,1 +1,11 @@
-Reset your password {{email}}
+<form action="{{ url('user.password.reset.action', {email: email, hash: hash}) }}" method="post">
+	<label for="password_reset-password">New password</label>
+	<input type="password" name="password_reset[password]" id="password_reset-password">
+
+	<label for="password_reset-password_confirm">Confirm new password</label>
+	<input type="password" name="password_reset[password_confirm]" id="password_reset-password_confirm">
+
+	<input type="hidden" name="login[redirect]" id="login-redirect" value="{{ redirectURL }}">
+
+	<button name="password_reset[submit]" id="password_reset-submit" type="Change my password &amp; log me in">Change my password &amp; log me in</button>
+</form>
