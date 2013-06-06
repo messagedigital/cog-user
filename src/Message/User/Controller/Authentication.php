@@ -24,16 +24,12 @@ class Authentication extends \Message\Cog\Controller\Controller
 	 *
 	 * @return Response           The response object
 	 */
-	public function login($redirectURL = '/')
+	public function login($redirectURL = '/', $forgottenPasswordRoute = null)
 	{
-		// Send the user away if they are already logged in
-		if ($this->get('user.current') instanceof UserInterface) {
-			return $this->redirect($redirectURL);
-		}
-
 		// Render the login form
 		return $this->render('::login', array(
-			'redirectURL' => $redirectURL,
+			'redirectURL'            => $redirectURL,
+			'forgottenPasswordRoute' => $forgottenPasswordRoute,
 		));
 	}
 

@@ -21,13 +21,13 @@ class Services implements ServicesInterface
 			return new \Message\User\Loader($c['db.query']);
 		});
 
-		$services['user.edit'] = $services->share(function($c) {
+		$services['user.edit'] = function($c) {
 			return new \Message\User\Edit(
 				$c['db.query'],
 				$c['event.dispatcher'],
 				$c['user.current']
 			);
-		});
+		};
 
 		$services['user.password_hash'] = $services->share(function($c) {
 			return new \Message\Cog\Security\Hash\Bcrypt($c['security.salt']);
