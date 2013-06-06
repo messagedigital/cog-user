@@ -8,5 +8,7 @@ class Routes implements RoutesInterface
 {
 	public function registerRoutes($router)
 	{
+		$router->add('user.login.action', '/user/login', '::Controller:Authentication#loginAction')
+			->setMethod('POST');
 	}
 }
