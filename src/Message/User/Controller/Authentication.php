@@ -45,7 +45,7 @@ class Authentication extends \Message\Cog\Controller\Controller
 	public function loginAction()
 	{
 		// If no form data set on request, redirect the user back to referer
-		if (!$data = $this->_services['request']->request->get('login')) {
+		if (!$data = $this->get('request')->request->get('login')) {
 			return $this->redirect($this->get('request')->headers->get('referer'));
 		}
 
@@ -57,37 +57,37 @@ class Authentication extends \Message\Cog\Controller\Controller
 		}
 
 		// Get the user
-		$user = $this->_services['user.loader']->getByEmail($data['email']);
+		$user = $this->get('user.loader')->getByEmail($data['email']);
 
 		// Fire login attempt event
-		$this->_services['event.dispatcher']->dispatch(
+		$this->get('event.dispatcher')->dispatch(
 			Event::LOGIN_ATTEMPT,
 			new Event($user)
 		);
 
 		// Check the user exists and the password is correct
-		if (!$user || !$this->_services['user.password_hash']->check(
+		if (!$user || !$this->get('user.password_hash')->check(
 			$data['password'],
-			$this->_services['user.loader']->getUserPassword($user)
+			$this->get('user.loader')->getUserPassword($user)
 		)) {
 			throw new \Exception('Login details incorrect: please check and try again.');
 		}
 
 		// Set the user session
-		$this->_services['http.session']->set($this->_services['cfg']->user->sessionName, $user);
+		$this->get('http.session')->set($this->get('cfg')->user->sessionName, $user);
 
 		// Fire the user login event
-		$this->_services['event.dispatcher']->dispatch(
+		$this->get('event.dispatcher')->dispatch(
 			Event::LOGIN,
 			new Event($user)
 		);
 
 		// If the user selected "keep me logged in", set the user cookie
 		if (isset($data['remember']) && 1 == $data['remember']) {
-			$this->_services['http.cookies']->add(new Cookie(
-				$this->_services['cfg']->user->cookieName,
-				$this->_services['user.session_hash']->generate($user),
-				new \DateTime('+' . $this->_services['cfg']->user->cookieLength)
+			$this->get('http.cookies')->add(new Cookie(
+				$this->get('cfg')->user->cookieName,
+				$this->get('user.session_hash')->generate($user),
+				new \DateTime('+' . $this->get('cfg')->user->cookieLength)
 			));
 		}
 
@@ -106,21 +106,22 @@ class Authentication extends \Message\Cog\Controller\Controller
 	{
 		$user = $this->get('user.current');
 
+		// If the user is already logged out, send them straight on
 		if (!($user instanceof UserInterface)) {
 			return $this->redirect($redirectURL);
 		}
 
 		// Clear the session
-		$this->_services['http.session']->remove($this->_services['cfg']->user->sessionName);
+		$this->get('http.session')->remove($this->get('cfg')->user->sessionName);
 		// Clear the cookie
-		$this->_services['http.cookies']->add(new Cookie(
-			$this->_services['cfg']->user->cookieName,
+		$this->get('http.cookies')->add(new Cookie(
+			$this->get('cfg')->user->cookieName,
 			null,
 			1
 		));
 
 		// Fire the user logout event
-		$this->_services['event.dispatcher']->dispatch(
+		$this->get('event.dispatcher')->dispatch(
 			Event::LOGOUT,
 			new Event($user)
 		);
