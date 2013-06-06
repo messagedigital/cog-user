@@ -70,8 +70,8 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 		);
 
 		$this->get('event.dispatcher')->dispatch(
-			Event::PASSWORD_REQUEST,
-			new Event($user)
+			Event\Event::PASSWORD_REQUEST,
+			new Event\Event($user)
 		);
 
 		// Give positive feedback
@@ -121,8 +121,8 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 		// Log the user in
 		$this->get('http.session')->set($this->get('cfg')->user->sessionName, $user);
 		$this->get('event.dispatcher')->dispatch(
-			Event::LOGIN,
-			new Event($user)
+			Event\Event::LOGIN,
+			new Event\Event($user)
 		);
 
 		return $this->redirect($data['redirect']);

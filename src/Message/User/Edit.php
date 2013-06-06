@@ -72,10 +72,10 @@ class Edit
 			'updatedBy' => $user->authorship->updatedBy(),
 		));
 
-		$event = new Event($user);
+		$event = new Event\Event($user);
 
 		$this->_eventDispatcher->dispatch(
-			Event::PASSWORD_RESET,
+			Event\Event::PASSWORD_RESET,
 			$event
 		);
 

@@ -14,9 +14,6 @@ use Message\Cog\HTTP\Cookie;
  */
 class Authentication extends \Message\Cog\Controller\Controller
 {
-	const SESSION_NAME = 'cog-user';
-	const COOKIE_NAME  = 'cog-user';
-
 	/**
 	 * Render the login form and inject a given redirect URL.
 	 *
@@ -60,8 +57,8 @@ class Authentication extends \Message\Cog\Controller\Controller
 
 		// Fire login attempt event
 		$this->get('event.dispatcher')->dispatch(
-			Event::LOGIN_ATTEMPT,
-			new Event($user)
+			Event\Event::LOGIN_ATTEMPT,
+			new Event\LoginAttemptEvent($user)
 		);
 
 		// Check the user exists and the password is correct
@@ -69,7 +66,9 @@ class Authentication extends \Message\Cog\Controller\Controller
 			$data['password'],
 			$this->get('user.loader')->getUserPassword($user)
 		)) {
-			throw new \Exception('Login details incorrect: please check and try again.');
+			$this->addFlash('error', 'Login details incorrect: please check and try again.');
+
+			return $this->redirect($this->get('request')->headers->get('referer'));
 		}
 
 		// Set the user session
@@ -77,8 +76,8 @@ class Authentication extends \Message\Cog\Controller\Controller
 
 		// Fire the user login event
 		$this->get('event.dispatcher')->dispatch(
-			Event::LOGIN,
-			new Event($user)
+			Event\Event::LOGIN,
+			new Event\Event($data['email'], $user)
 		);
 
 		// If the user selected "keep me logged in", set the user cookie
@@ -121,8 +120,8 @@ class Authentication extends \Message\Cog\Controller\Controller
 
 		// Fire the user logout event
 		$this->get('event.dispatcher')->dispatch(
-			Event::LOGOUT,
-			new Event($user)
+			Event\Event::LOGOUT,
+			new Event\Event($user)
 		);
 
 		return $this->redirect($redirectURL);

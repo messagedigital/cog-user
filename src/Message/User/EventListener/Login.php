@@ -2,7 +2,7 @@
 
 namespace Message\User\EventListener;
 
-use Message\User\Event;
+use Message\User\Event\Event;
 
 use Message\Cog\Event\SubscriberInterface;
 use Message\Cog\Service\ContainerAwareInterface;

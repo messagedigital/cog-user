@@ -1,6 +1,8 @@
 <?php
 
-namespace Message\User;
+namespace Message\User\Event;
+
+use Message\User\User;
 
 /**
  * User event.
