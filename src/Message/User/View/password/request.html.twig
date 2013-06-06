@@ -1,6 +1,6 @@
-<form action="" method="post">
+<form action="{{ url('user.password.request.action') }}" method="post">
 	<label for="password_request-email">Email address</label>
-	<input type="email" name="password_request[email]" id="password_request-email">
+	<input type="email" name="password_request[email]" id="password_request-email" value="{{ email }}">
 
 	<button name="password_request[submit]" id="password_request-submit" type="Send me a link to reset my password">Send me a link to reset my password</button>
 </form>

@@ -10,5 +10,7 @@ class Routes implements RoutesInterface
 	{
 		$router->add('user.login.action', '/user/login', '::Controller:Authentication#loginAction')
 			->setMethod('POST');
+		$router->add('user.password.request.action', '/user/password/request', '::Controller:ForgottenPassword#requestAction')
+			->setMethod('POST');
 	}
 }
