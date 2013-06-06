@@ -50,7 +50,9 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 
 	public function reset($email, $hash)
 	{
-
+		return $this->render('::password/reset', array(
+			'email' => $email,
+		));
 	}
 
 	public function resetAction($email, $hash)
