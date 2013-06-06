@@ -143,7 +143,7 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 
 	protected function _checkHash(User $user, $hash)
 	{
-		if ($hash !== $this->_generateHash($user)) {
+		if (!$user->passwordRequestAt || $hash !== $this->_generateHash($user)) {
 			throw new \Exception('Hash invalid');
 		}
 
