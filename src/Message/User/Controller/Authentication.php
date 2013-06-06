@@ -26,7 +26,6 @@ class Authentication extends \Message\Cog\Controller\Controller
 	 */
 	public function login($redirectURL = '/', $forgottenPasswordRoute = null)
 	{
-		// Render the login form
 		return $this->render('::login', array(
 			'redirectURL'            => $redirectURL,
 			'forgottenPasswordRoute' => $forgottenPasswordRoute,
@@ -102,7 +101,7 @@ class Authentication extends \Message\Cog\Controller\Controller
 	 *
 	 * @return Response The response object
 	 */
-	public function logout($redirectURL = '/')
+	public function logoutAction($redirectURL = '/')
 	{
 		$user = $this->get('user.current');
 
