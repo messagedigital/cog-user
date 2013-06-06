@@ -42,6 +42,16 @@ class Edit
 
 	}
 
+	public function addToGroup(User $user, Group\GroupInterface $group)
+	{
+
+	}
+
+	public function removeFromGroup(User $user, Group\GroupInterface $group)
+	{
+
+	}
+
 	/**
 	 * Update the "last login at" timestamp for a given user in the database
 	 * and the model.
