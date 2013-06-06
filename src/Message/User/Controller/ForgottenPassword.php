@@ -118,12 +118,6 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 		$this->get('user.edit')->changePassword($user, $data['password']);
 		$this->get('user.edit')->clearPasswordRequestTime($user);
 
-		// Dispatch password reset event
-		$this->get('event.dispatcher')->dispatch(
-			Event::PASSWORD_RESET,
-			new Event($user)
-		);
-
 		// Log the user in
 		$this->get('http.session')->set($this->get('cfg')->user->sessionName, $user);
 		$this->get('event.dispatcher')->dispatch(

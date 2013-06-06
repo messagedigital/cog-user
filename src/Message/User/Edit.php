@@ -48,7 +48,7 @@ class Edit
 	 * @param  User   $user        The user to change the password for
 	 * @param  string $newPassword The password in plain text
 	 *
-	 * @return bool                True if the update was successful
+	 * @return User                The user that was updated
 	 */
 	public function changePassword(User $user, $newPassword)
 	{
@@ -72,7 +72,14 @@ class Edit
 			'updatedBy' => $user->authorship->updatedBy(),
 		));
 
-		return (bool) $result->affected();
+		$event = new Event($user);
+
+		$this->_eventDispatcher->dispatch(
+			Event::PASSWORD_RESET,
+			$event
+		);
+
+		return $event->getUser();
 	}
 
 	public function addToGroup(User $user, Group\GroupInterface $group)
