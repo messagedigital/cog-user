@@ -18,60 +18,78 @@ class Authentication extends \Message\Cog\Controller\Controller
 	const COOKIE_NAME  = 'cog-user';
 
 	/**
-	 * Render the login form & run the log in action if the form is submitted.
+	 * Render the login form and inject a given redirect URL.
+	 *
+	 * @param string $redirectURL The URL to redirect to after successful login
+	 *
+	 * @return Response           The response object
+	 */
+	public function login($redirectURL = '/')
+	{
+		// Send the user away if they are already logged in
+		if ($this->get('user.current') instanceof UserInterface) {
+			return $this->redirect($redirectURL);
+		}
+
+		// Render the login form
+		return $this->render('::login', array(
+			'redirectURL' => $redirectURL,
+		));
+	}
+
+	/**
+	 * Run the log in action.
 	 *
 	 * This checks the credentials entered into the form against the database,
 	 * and if they are correct, logs the user in by setting their session. If
 	 * the user selected "keep me logged in", the cookie is set.
 	 *
-	 * @param string $redirectURL The URL to redirect to after successful login
-	 *
 	 * @return Response The response object
 	 */
-	public function login($redirectURL = '/')
+	public function loginAction()
 	{
+		// If no form data set on request, redirect the user back to referer
+		if (!$data = $this->_services['request']->request->get('login')) {
+			return $this->redirect($this->get('request')->headers->get('referer'));
+		}
+
+		$redirectURL = $data['redirect'];
+
 		// Send the user away if they are already logged in
-		if ($this->_services['http.session']->get($this->_services['cfg']->user->sessionName) instanceof UserInterface) {
+		if ($this->get('user.current') instanceof UserInterface) {
 			return $this->redirect($redirectURL);
 		}
 
-		// If form is submitted
-		if ($data = $this->_services['http.request.master']->get('login')) {
-			// Get the user
-			$user = $this->_services['user.loader']->getByEmail($data['email']);
+		// Get the user
+		$user = $this->_services['user.loader']->getByEmail($data['email']);
 
-			// Check the user exists and the password is correct
-			if (!$user || !$this->_services['user.password_hash']->check(
-				$data['password'],
-				$this->_services['user.loader']->getUserPassword($user)
-			)) {
-				throw new \Exception('Login details incorrect: please check and try again.');
-			}
-
-			// Set the user session
-			$this->_services['http.session']->set($this->_services['cfg']->user->sessionName, $user);
-
-			// Fire the user login event
-			$this->_services['event.dispatcher']->dispatch(
-				Event::LOGIN,
-				new Event($user)
-			);
-
-			// If the user selected "keep me logged in", set the user cookie
-			if (isset($data['remember']) && 1 == $data['remember']) {
-				$this->_services['http.cookies']->add(new Cookie(
-					$this->_services['cfg']->user->cookieName,
-					$this->_services['user.session_hash']->generate($user),
-					new \DateTime('+' . $this->_services['cfg']->user->cookieLength)
-				));
-			}
-
-			// fire user.login event!!! then make the "update last login time" a listener
-
-			return $this->redirect($redirectURL);
+		// Check the user exists and the password is correct
+		if (!$user || !$this->_services['user.password_hash']->check(
+			$data['password'],
+			$this->_services['user.loader']->getUserPassword($user)
+		)) {
+			throw new \Exception('Login details incorrect: please check and try again.');
 		}
 
-		return $this->render('::login');
+		// Set the user session
+		$this->_services['http.session']->set($this->_services['cfg']->user->sessionName, $user);
+
+		// Fire the user login event
+		$this->_services['event.dispatcher']->dispatch(
+			Event::LOGIN,
+			new Event($user)
+		);
+
+		// If the user selected "keep me logged in", set the user cookie
+		if (isset($data['remember']) && 1 == $data['remember']) {
+			$this->_services['http.cookies']->add(new Cookie(
+				$this->_services['cfg']->user->cookieName,
+				$this->_services['user.session_hash']->generate($user),
+				new \DateTime('+' . $this->_services['cfg']->user->cookieLength)
+			));
+		}
+
+		return $this->redirect($redirectURL);
 	}
 
 	/**
