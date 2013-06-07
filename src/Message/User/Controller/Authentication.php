@@ -58,7 +58,7 @@ class Authentication extends \Message\Cog\Controller\Controller
 		// Fire login attempt event
 		$this->get('event.dispatcher')->dispatch(
 			Event\Event::LOGIN_ATTEMPT,
-			new Event\LoginAttemptEvent($user)
+			new Event\LoginAttemptEvent($data['email'], $user)
 		);
 
 		// Check the user exists and the password is correct
@@ -77,7 +77,7 @@ class Authentication extends \Message\Cog\Controller\Controller
 		// Fire the user login event
 		$this->get('event.dispatcher')->dispatch(
 			Event\Event::LOGIN,
-			new Event\Event($data['email'], $user)
+			new Event\Event($user)
 		);
 
 		// If the user selected "keep me logged in", set the user cookie

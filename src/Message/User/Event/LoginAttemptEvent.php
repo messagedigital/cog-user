@@ -2,6 +2,8 @@
 
 namespace Message\User\Event;
 
+use Message\User\User;
+
 /**
  * Event for when a login attempt is made.
  *
