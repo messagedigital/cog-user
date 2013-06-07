@@ -29,7 +29,7 @@ class LoginAttemptEvent extends Event
 	/**
 	 * Get the email address for the login attempt.
 	 *
-	 * @return User
+	 * @return string
 	 */
 	public function getEmail()
 	{

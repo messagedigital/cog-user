@@ -5,6 +5,8 @@ namespace Message\User\Controller;
 use Message\User\User;
 use Message\User\Event;
 
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+
 /**
  * Controller for requesting a password reset link & resetting passwords.
  *
@@ -34,23 +36,27 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 	 * to use to reset their password.
 	 *
 	 * @todo implement email component when built
-	 * @todo implement user feedback properly (negative + positive)
 	 * @todo update password requested at timestamp within event listener??
 	 *
 	 * @return Response           The response object
 	 */
 	public function requestAction()
 	{
+		$redirect = $this->redirect($this->get('request')->headers->get('referer'));
+
 		// If no form data set on request, redirect the user back to referer
 		if (!$data = $this->_services['request']->request->get('password_request')) {
-			return $this->redirect($this->get('request')->headers->get('referer'));
+			return $redirect;
 		}
 
 		// Get the user
 		$user = $this->_services['user.loader']->getByEmail($data['email']);
 
+		// Throw error if user is not found
 		if (!$user) {
-			throw new \Exception(sprintf('Could not find user for email address `%s`', $data['email']));
+			$this->addFlash('error', sprintf('Could not find user for email address `%s`', $data['email']));
+
+			return $redirect;
 		}
 
 		// Update the "password requested at" timestamp
@@ -69,22 +75,27 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 			), true)
 		);
 
+		// Dispatch password request event
 		$this->get('event.dispatcher')->dispatch(
 			Event\Event::PASSWORD_REQUEST,
 			new Event\Event($user)
 		);
 
 		// Give positive feedback
+		$this->addFlash('success', sprintf(
+			'We\'ve emailed you a secure link to use to reset your password. It will expire in %s.',
+			$this->get('cfg')->user->forgottenPasswordExpiry
+		));
 
 		// Redirect to referer
-		return $this->redirect($this->get('request')->headers->get('referer'));
+		return $redirect;
 	}
 
 	public function reset($email, $hash, $redirectURL = '/')
 	{
 		$user = $this->get('user.loader')->getByEmail($email);
 
-		$this->_checkHash($user, $hash);
+		$this->_validateHash($user, $hash, $redirectURL);
 
 		return $this->render('::password/reset', array(
 			'email'       => $email,
@@ -97,21 +108,23 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 	{
 		$user = $this->get('user.loader')->getByEmail($email);
 
-		$this->_checkHash($user, $hash);
-
 		// If no form data set on request, redirect the user back to referer
 		if (!$data = $this->_services['request']->request->get('password_reset')) {
 			return $this->redirect($this->get('request')->headers->get('referer'));
 		}
 
+		$this->_validateHash($user, $hash, $data['redirect']);
+
 		// Check user exists
 		if (!$user) {
-			throw new \Exception(sprintf('No user exists for email address `%s`', $email));
+			throw new AccessDeniedHttpException('User not found for this password reset request.');
 		}
 
 		// Check the passwords match
 		if ($data['password'] !== $data['password_confirm']) {
-			throw new \Exception('The entered passwords do not match: please try again.');
+			$this->addFlash('error', 'The entered passwords do not match: please try again.');
+
+			return $this->redirect($data['redirect']);
 		}
 
 		// Change the password & clear the requested timestamp
@@ -141,10 +154,20 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 		);
 	}
 
-	protected function _checkHash(User $user, $hash)
+	protected function _validateHash(User $user, $hash)
 	{
+		// Check there is a password requested timestamp & the hash is correct
 		if (!$user->passwordRequestAt || $hash !== $this->_generateHash($user)) {
-			throw new \Exception('Hash invalid');
+			throw new AccessDeniedHttpException('Hash invalid.');
+		}
+
+		$passwordExpiry = $user->passwordRequestAt->add(
+			\DateInterval::createFromDateString($this->get('cfg')->user->forgottenPasswordExpiry)
+		);
+
+		// Check if password request has expired
+		if ($passwordExpiry < new \DateTime) {
+			throw new AccessDeniedHttpException('This password reset link has expired.');
 		}
 
 		return true;
