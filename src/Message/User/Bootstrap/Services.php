@@ -42,8 +42,12 @@ class Services implements ServicesInterface
 			);
 		});
 
+		$services['user.permissions'] = $services->share(function($c) {
+			return new \Message\User\Permissions($c['user.groups']);
+		});
+
 		$services['user.groups'] = $services->share(function() {
-			return new \Message\User\Group\Collection;
+			return new \Message\User\Group\Collection();
 		});
 
 		$services['user.group.loader'] = $services->share(function() {

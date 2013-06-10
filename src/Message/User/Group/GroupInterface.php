@@ -2,6 +2,8 @@
 
 namespace Message\User\Group;
 
+use Message\User\Permissions;
+
 /**
  * Interface that defines a user group.
  *
@@ -29,4 +31,11 @@ interface GroupInterface
 	 * @return string The description
 	 */
 	public function getDescription();
+
+	/**
+	 * Set the permissions for this group.
+	 *
+	 * @param Permissions $permissions The permissions manager
+	 */
+	public function setPermissions(Permissions $permissions);
 }
