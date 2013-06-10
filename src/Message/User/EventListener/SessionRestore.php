@@ -3,9 +3,8 @@
 namespace Message\User\EventListener;
 
 use Message\Cog\HTTP\Cookie;
+use Message\Cog\Event\EventListener;
 use Message\Cog\Event\SubscriberInterface;
-use Message\Cog\Service\ContainerAwareInterface;
-use Message\Cog\Service\ContainerInterface;
 
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -15,23 +14,13 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
  *
  * @author Joe Holdcroft <joe@message.co.uk>
  */
-class SessionRestore implements SubscriberInterface, ContainerAwareInterface
+class SessionRestore extends EventListener implements SubscriberInterface
 {
-	protected $_services;
-
 	static public function getSubscribedEvents()
 	{
 		return array(KernelEvents::REQUEST => array(
 			array('restoreSessionFromCookie')
 		));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function setContainer(ContainerInterface $container)
-	{
-		$this->_services = $container;
 	}
 
 	/**

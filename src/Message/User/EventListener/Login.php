@@ -5,31 +5,20 @@ namespace Message\User\EventListener;
 use Message\User\Event\Event;
 
 use Message\Cog\Event\SubscriberInterface;
-use Message\Cog\Service\ContainerAwareInterface;
-use Message\Cog\Service\ContainerInterface;
+use Message\Cog\Event\EventListener;
 
 /**
  * Event listener for when a user logs in to the system.
  *
  * @author Joe Holdcroft <joe@message.co.uk>
  */
-class Login implements SubscriberInterface, ContainerAwareInterface
+class Login extends EventListener implements SubscriberInterface
 {
-	protected $_services;
-
 	static public function getSubscribedEvents()
 	{
 		return array(Event::LOGIN => array(
 			array('updateLastLoginTimestamp')
 		));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function setContainer(ContainerInterface $container)
-	{
-		$this->_services = $container;
 	}
 
 	/**
