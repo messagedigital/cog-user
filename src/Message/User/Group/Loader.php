@@ -4,7 +4,7 @@ namespace Message\User\Group;
 
 use Message\User\UserInterface;
 
-use Message\Cog\DB\Query;
+use Message\Cog\DB;
 
 /**
  * Group loader decorator.
@@ -20,11 +20,11 @@ class Loader
 	 * Constructor.
 	 *
 	 * @param Collection $groups The group collection
-	 * @param Query      $query  The database query instance to use
+	 * @param DB\Query   $query  The database query instance to use
 	 */
-	public function __construct(Collection $groups, DBQuery $query)
+	public function __construct(Collection $groups, DB\Query $query)
 	{
-		$this->_groups = $group;
+		$this->_groups = $groups;
 		$this->_query  = $query;
 	}
 
@@ -61,7 +61,7 @@ class Loader
 	public function getByUser(UserInterface $user)
 	{
 		$return = array();
-		$result = $this->_db->query('
+		$result = $this->_query->run('
 			SELECT
 				group_name
 			FROM

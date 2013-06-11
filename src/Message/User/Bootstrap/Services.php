@@ -2,6 +2,8 @@
 
 namespace Message\User\Bootstrap;
 
+use Message\User;
+
 use Message\Cog\Bootstrap\ServicesInterface;
 
 class Services implements ServicesInterface
@@ -35,23 +37,23 @@ class Services implements ServicesInterface
 		});
 
 		$services['user.session_hash'] = $services->share(function($c) {
-			return new \Message\User\SessionHash(
+			return new User\SessionHash(
 				$c['security.hash'],
 				$c['user.loader'],
 				'aKDx213BZ8X25j8az34TRx'
 			);
 		});
 
-		$services['user.permissions'] = $services->share(function($c) {
-			return new \Message\User\Permissions($c['user.groups']);
-		});
-
 		$services['user.groups'] = $services->share(function() {
-			return new \Message\User\Group\Collection();
+			return new User\Group\Collection;
 		});
 
-		$services['user.group.loader'] = $services->share(function() {
-			return new \Message\User\Group\Loader($c['user.groups'], $c['db.query']);
+		$services['user.group.loader'] = function($c) {
+			return new User\Group\Loader($c['user.groups'], $c['db.query']);
+		};
+
+		$services['user.permission.registry'] = $services->share(function() {
+			return new User\PermissionRegistry;
 		});
 	}
 }

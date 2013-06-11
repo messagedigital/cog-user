@@ -18,5 +18,6 @@ class Events implements EventsInterface
 	{
 		$dispatcher->addSubscriber(new \Message\User\EventListener\Login);
 		$dispatcher->addSubscriber(new \Message\User\EventListener\SessionRestore);
+		$dispatcher->addSubscriber(new \Message\User\EventListener\Permissions);
 	}
 }
