@@ -23,9 +23,13 @@ class PermissionRegistry
 
 	public function isProtected(Request $request)
 	{
-		// TODO: check the request actually has a route and collection set?
-		// TODO: check route collection
-		if (in_array($request->attributes->get('_route'), $this->_protectedRoutes)) {
+		if ($request->attributes->has('_routeCollection')
+		 && in_array($request->attributes->get('_routeCollection'), $this->_protectedRouteCollections)) {
+			return true;
+		}
+
+		if ($request->attributes->has('_route')
+		 && in_array($request->attributes->get('_route'), $this->_protectedRoutes)) {
 			return true;
 		}
 
