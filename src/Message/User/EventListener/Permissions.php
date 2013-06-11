@@ -12,12 +12,15 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
- *
+ * Event listener for permissions related behaviour.
  *
  * @author Joe Holdcroft <joe@message.co.uk>
  */
 class Permissions extends EventListener implements SubscriberInterface
 {
+	/**
+	 * {@inheritDoc}
+	 */
 	static public function getSubscribedEvents()
 	{
 		return array(
@@ -30,6 +33,14 @@ class Permissions extends EventListener implements SubscriberInterface
 		);
 	}
 
+	/**
+	 * Register the permissions to the permissions registry from the group
+	 * collection.
+	 *
+	 * This is run once all modules have been loaded.
+	 *
+	 * @param Event $event The event
+	 */
 	public function registerPermissions(Event $event)
 	{
 		$this->_services['user.permission.registry']->registerGroups(
@@ -38,11 +49,17 @@ class Permissions extends EventListener implements SubscriberInterface
 	}
 
 	/**
+	 * Check if the current user has permission to access this request.
 	 *
+	 * This asks the permissions registry whether the current request is
+	 * protected. A route is protected when any user group registers a
+	 * permission for the route itself or a route collection it is within).
 	 *
-	 * @param  GetResponseEvent $event The event instance
+	 * @param GetResponseEvent $event The event instance
 	 *
-	 *
+	 * @throws AccessDeniedHttpException If the request is protected and the
+	 *                                   current user does not have permission
+	 *                                   to access it
 	 */
 	public function checkPermissions(GetResponseEvent $event)
 	{

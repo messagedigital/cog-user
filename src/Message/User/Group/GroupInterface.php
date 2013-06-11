@@ -34,6 +34,10 @@ interface GroupInterface
 	/**
 	 * Register the permissions for this group.
 	 *
+	 * Any route or route collection defined here become "protected", and their
+	 * requests will only be accessible to users who have the necessary
+	 * permissions to access the request.
+	 *
 	 * @param Permissions $permissions The group permissions instance
 	 */
 	public function registerPermissions(Permissions $permissions);

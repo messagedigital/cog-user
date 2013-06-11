@@ -5,6 +5,11 @@ namespace Message\User;
 use Message\Cog\Cache\InstanceInterface as CacheInstanceInterface;
 use Message\Cog\HTTP\Request;
 
+/**
+ * Registry of user group permissions.
+ *
+ * @author Joe Holdcroft <joe@message.co.uk>
+ */
 class PermissionRegistry
 {
 	protected $_permissions;
@@ -12,15 +17,17 @@ class PermissionRegistry
 	protected $_protectedRoutes = array();
 	protected $_protectedRouteCollections = array();
 
-	public function registerGroups(Group\Collection $collection)
-	{
-		foreach ($collection as $group) {
-			$this->_registerGroup($group);
-		}
-
-		return $this;
-	}
-
+	/**
+	 * Check if a given HTTP request is protected.
+	 *
+	 * A request becomes protected once any group has registered a permission
+	 * for the route to the request, or any route collection that the route to
+	 * the request belongs to.
+	 *
+	 * @param  Request $request The request to check
+	 *
+	 * @return boolean          True if the request is protected
+	 */
 	public function isProtected(Request $request)
 	{
 		// If the current route is in a collection
@@ -46,6 +53,17 @@ class PermissionRegistry
 		return false;
 	}
 
+	/**
+	 * Determine if a given group can access a given request.
+	 *
+	 * @param  Group\GroupInterface $group   The group
+	 * @param  Request              $request The request
+	 *
+	 * @return boolean                       True if the group have ample permission
+	 *
+	 * @throws \InvalidArgumentException If the given group has not been
+	 *                                   registered to this registry instance
+	 */
 	public function canGroupAccess(Group\GroupInterface $group, Request $request)
 	{
 		// If the route isn't protected, all can access it!
@@ -53,6 +71,7 @@ class PermissionRegistry
 			return true;
 		}
 
+		// Throw exception if we don't know about this group
 		if (!isset($this->_permissions[$group->getName()])) {
 			throw new \InvalidArgumentException(sprintf(
 				'Group `%s` has not been registered to the permissions registry.',
@@ -89,6 +108,29 @@ class PermissionRegistry
 		return false;
 	}
 
+	/**
+	 * Register a collection of groups to this permission registry.
+	 *
+	 * @param  Group\Collection $collection The group collection to register
+	 *
+	 * @return PermissionRegistry           Returns $this for chainability
+	 */
+	public function registerGroups(Group\Collection $collection)
+	{
+		foreach ($collection as $group) {
+			$this->_registerGroup($group);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Register a single group to this permission registry.
+	 *
+	 * @param  Group\GroupInterface $group The group to register
+	 *
+	 * @return PermissionRegistry          Returns $this for chainability
+	 */
 	protected function _registerGroup(Group\GroupInterface $group)
 	{
 		$permissions = new Group\Permissions($group);
