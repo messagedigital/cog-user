@@ -23,11 +23,21 @@ class PermissionRegistry
 
 	public function isProtected(Request $request)
 	{
-		if ($request->attributes->has('_routeCollection')
-		 && in_array($request->attributes->get('_routeCollection'), $this->_protectedRouteCollections)) {
-			return true;
+		// If the current route is in a collection
+		if ($request->attributes->has('_route_collections')) {
+			// Determine the current route collection(s) that are protected
+			$currentRouteCollections = array_intersect(
+				$this->_protectedRouteCollections,
+				$request->attributes->get('_route_collections')
+			);
+
+			// If there are any, return true
+			if (!empty($currentRouteCollections)) {
+				return true;
+			}
 		}
 
+		// If this request has a route, and that route is protected, return true
 		if ($request->attributes->has('_route')
 		 && in_array($request->attributes->get('_route'), $this->_protectedRoutes)) {
 			return true;
@@ -54,8 +64,10 @@ class PermissionRegistry
 		$routeName  = $request->attributes->get('_route');
 
 		// Check if the group can access this entire route collection
-		if ($groupPerms->hasRouteCollection($request->attributes->get('_routeCollection'))) {
-			return true;
+		foreach ($request->attributes->get('_route_collections') as $collectionName) {
+			if ($groupPerms->hasRouteCollection($collectionName)) {
+				return true;
+			}
 		}
 
 		// Check if the group can access this specific route

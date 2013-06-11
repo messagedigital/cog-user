@@ -22,7 +22,7 @@ class Permissions extends EventListener implements SubscriberInterface
 	{
 		return array(
 			KernelEvents::REQUEST => array(
-				array('checkPermissions', 31)
+				array('checkPermissions')
 			),
 			'modules.load.success' => array(
 				array('registerPermissions', -100)
@@ -64,7 +64,6 @@ class Permissions extends EventListener implements SubscriberInterface
 			}
 		}
 
-		// todo: change this to the correct exception type
 		throw new AccessDeniedHttpException('You do not have permission to view this page.');
 	}
 }

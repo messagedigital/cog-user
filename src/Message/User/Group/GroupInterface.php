@@ -17,7 +17,8 @@ interface GroupInterface
 	public function getName();
 
 	/**
-	 * Get the nicely formatted display name for the group, e.g. 'Super Admin'.
+	 * Get a nicely formatted name for this group that can be displayed to the
+	 * user, e.g. 'Super Admin'.
 	 *
 	 * @return string The display name
 	 */

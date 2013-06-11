@@ -46,7 +46,7 @@ class Permissions
 
 	public function hasRouteCollection($collectionName)
 	{
-		return in_array($collectionName, $this->_routes);
+		return in_array($collectionName, $this->_routeCollections);
 	}
 
 	public function addRoute($routeName, array $paramRequirements = null)
