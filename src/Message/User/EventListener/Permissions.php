@@ -9,6 +9,7 @@ use Message\Cog\Event\SubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  *
@@ -64,6 +65,6 @@ class Permissions extends EventListener implements SubscriberInterface
 		}
 
 		// todo: change this to the correct exception type
-		throw new \Exception('NO YOU CAN\'T');
+		throw new AccessDeniedHttpException('You do not have permission to view this page.');
 	}
 }
