@@ -24,7 +24,7 @@ class Loader
 	 */
 	public function __construct(Collection $groups, Query $query)
 	{
-		$this->_groups = $group;
+		$this->_groups = $groups;
 		$this->_query  = $query;
 	}
 
