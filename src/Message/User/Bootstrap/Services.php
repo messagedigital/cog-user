@@ -46,7 +46,7 @@ class Services implements ServicesInterface
 			return new \Message\User\Group\Collection;
 		});
 
-		$services['user.group.loader'] = $services->share(function() {
+		$services['user.group.loader'] = $services->share(function($c) {
 			return new \Message\User\Group\Loader($c['user.groups'], $c['db.query']);
 		});
 	}

@@ -22,7 +22,7 @@ class Loader
 	 * @param Collection $groups The group collection
 	 * @param Query      $query  The database query instance to use
 	 */
-	public function __construct(Collection $groups, DBQuery $query)
+	public function __construct(Collection $groups, Query $query)
 	{
 		$this->_groups = $group;
 		$this->_query  = $query;
