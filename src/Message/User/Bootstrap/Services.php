@@ -24,8 +24,9 @@ class Services implements ServicesInterface
 		$services['user.create'] = function($c) {
 			return new \Message\User\Create(
 				$c['user.loader'],
-				$c['event.dispatcher'],
-				$c['user.password_hash']
+				$c['db.query'],
+				$c['event.dispatcher']
+				// $c['user.password_hash'] Is this needed at this level?
 			);
 		}
 
