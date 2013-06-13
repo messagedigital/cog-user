@@ -52,8 +52,12 @@ class Services implements ServicesInterface
 			return new User\Group\Collection;
 		});
 
-		$services['user.group.loader'] = $services->share(function($c) {
+		$services['user.group.loader'] = function($c) {
 			return new User\Group\Loader($c['user.groups'], $c['db.query']);
+		};
+
+		$services['user.permission.registry'] = $services->share(function() {
+			return new User\PermissionRegistry;
 		});
 	}
 }

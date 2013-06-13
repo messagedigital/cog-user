@@ -14,6 +14,9 @@ use Message\Cog\Event\EventListener;
  */
 class Login extends EventListener implements SubscriberInterface
 {
+	/**
+	 * {@inheritDoc}
+	 */
 	static public function getSubscribedEvents()
 	{
 		return array(Event::LOGIN => array(

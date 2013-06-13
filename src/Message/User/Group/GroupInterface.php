@@ -17,7 +17,8 @@ interface GroupInterface
 	public function getName();
 
 	/**
-	 * Get the nicely formatted display name for the group, e.g. 'Super Admin'.
+	 * Get a nicely formatted name for this group that can be displayed to the
+	 * user, e.g. 'Super Admin'.
 	 *
 	 * @return string The display name
 	 */
@@ -29,4 +30,15 @@ interface GroupInterface
 	 * @return string The description
 	 */
 	public function getDescription();
+
+	/**
+	 * Register the permissions for this group.
+	 *
+	 * Any route or route collection defined here become "protected", and their
+	 * requests will only be accessible to users who have the necessary
+	 * permissions to access the request.
+	 *
+	 * @param Permissions $permissions The group permissions instance
+	 */
+	public function registerPermissions(Permissions $permissions);
 }

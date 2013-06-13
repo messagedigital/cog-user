@@ -16,10 +16,13 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
  */
 class SessionRestore extends EventListener implements SubscriberInterface
 {
+	/**
+	 * {@inheritDoc}
+	 */
 	static public function getSubscribedEvents()
 	{
 		return array(KernelEvents::REQUEST => array(
-			array('restoreSessionFromCookie')
+			array('restoreSessionFromCookie', 900)
 		));
 	}
 
