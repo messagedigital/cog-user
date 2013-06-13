@@ -1,9 +1,12 @@
 <?php 
 
+namespace Message\User\Create;
+
 use Message\User\User;
 use Message\User\Loader;
 
 use Message\Cog\Event\DispatcherInterface;
+use Message\Cog\DB\Query as DBQuery;
 
 /**
  * Decorator for creating new users.
