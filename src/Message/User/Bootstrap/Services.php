@@ -11,20 +11,24 @@ class Services implements ServicesInterface
 	public function registerServices($services)
 	{
 		$services['user'] = function() {
-			return new \Message\User\User;
+			return new User\User;
 		};
 
 		// Get the currently logged in user
 		$services['user.current'] = function($c) {
-			return $c['http.session']->get($c['cfg']->user->sessionName);
+			if ($user = $c['http.session']->get($c['cfg']->user->sessionName)) {
+				return $user;
+			}
+
+			return new User\AnonymousUser;
 		};
 
 		$services['user.loader'] = $services->share(function($c) {
-			return new \Message\User\Loader($c['db.query']);
+			return new User\Loader($c['db.query']);
 		});
 
 		$services['user.edit'] = function($c) {
-			return new \Message\User\Edit(
+			return new User\Edit(
 				$c['db.query'],
 				$c['event.dispatcher'],
 				$c['user.password_hash'],
@@ -49,7 +53,7 @@ class Services implements ServicesInterface
 		});
 
 		$services['user.group.loader'] = function($c) {
-			return new \Message\User\Group\Loader($c['user.groups'], $c['db.query']);
+			return new User\Group\Loader($c['user.groups'], $c['db.query']);
 		};
 
 		$services['user.permission.registry'] = $services->share(function() {
