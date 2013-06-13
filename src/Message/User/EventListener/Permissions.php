@@ -2,6 +2,8 @@
 
 namespace Message\User\EventListener;
 
+use Message\User\AnonymousUser;
+
 use Message\Cog\Event\Event;
 use Message\Cog\Event\EventListener;
 use Message\Cog\Event\SubscriberInterface;
@@ -73,11 +75,14 @@ class Permissions extends EventListener implements SubscriberInterface
 			return false;
 		}
 
-		$groups = $this->_services['user.group.loader']->getByUser($this->_services['user.current']);
+		// Only check permissions if the user is logged in
+		if (!($this->_services['user.current'] instanceof AnonymousUser)) {
+			$groups = $this->_services['user.group.loader']->getByUser($this->_services['user.current']);
 
-		foreach ($groups as $group) {
-			if ($this->_services['user.permission.registry']->canGroupAccess($group, $this->_services['request'])) {
-				return true;
+			foreach ($groups as $group) {
+				if ($this->_services['user.permission.registry']->canGroupAccess($group, $this->_services['request'])) {
+					return true;
+				}
 			}
 		}
 
