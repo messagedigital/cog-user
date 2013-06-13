@@ -49,7 +49,7 @@ class Services implements ServicesInterface
 		});
 
 		$services['user.group.loader'] = function($c) {
-			return new User\Group\Loader($c['user.groups'], $c['db.query']);
+			return new \Message\User\Group\Loader($c['user.groups'], $c['db.query']);
 		};
 
 		$services['user.permission.registry'] = $services->share(function() {
