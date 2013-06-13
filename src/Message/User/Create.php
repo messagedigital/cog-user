@@ -16,6 +16,11 @@ use Message\Cog\DB\Query as DBQuery;
  */
 class Create
 {	
+
+	protected $_loader;
+	protected $_query;
+	protected $_eventDispatcher;
+
 	/**
 	 * Constructor.
 	 *
