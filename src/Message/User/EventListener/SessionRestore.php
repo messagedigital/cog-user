@@ -36,7 +36,7 @@ class SessionRestore extends EventListener implements SubscriberInterface
 	public function restoreSessionFromCookie(GetResponseEvent $event)
 	{
 		// Skip this if there is already a user logged in
-		if ($this->_services['user.current']) {
+		if (!($this->_services['user.current'] instanceof AnonymousUser)) {
 			return false;
 		}
 
