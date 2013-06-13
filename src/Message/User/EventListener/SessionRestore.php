@@ -22,7 +22,7 @@ class SessionRestore extends EventListener implements SubscriberInterface
 	static public function getSubscribedEvents()
 	{
 		return array(KernelEvents::REQUEST => array(
-			array('restoreSessionFromCookie', 999)
+			array('restoreSessionFromCookie', 900)
 		));
 	}
 
