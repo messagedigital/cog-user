@@ -3,6 +3,7 @@
 namespace Message\User\Controller;
 
 use Message\User\UserInterface;
+use Message\User\AnonymousUser;
 use Message\User\Event;
 
 use Message\Cog\HTTP\Cookie;
@@ -48,7 +49,7 @@ class Authentication extends \Message\Cog\Controller\Controller
 		$redirectURL = $data['redirect'];
 
 		// Send the user away if they are already logged in
-		if ($this->get('user.current') instanceof UserInterface) {
+		if (!($this->get('user.current') instanceof AnonymousUser)) {
 			return $this->redirect($redirectURL);
 		}
 
@@ -105,7 +106,7 @@ class Authentication extends \Message\Cog\Controller\Controller
 		$user = $this->get('user.current');
 
 		// If the user is already logged out, send them straight on
-		if (!($user instanceof UserInterface)) {
+		if ($user instanceof AnonymousUser) {
 			return $this->redirect($redirectURL);
 		}
 
