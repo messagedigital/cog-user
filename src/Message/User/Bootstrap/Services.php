@@ -21,6 +21,7 @@ class Services implements ServicesInterface
 			return new \Message\User\Loader($c['db.query']);
 		});
 
+
 		$services['user.create'] = function($c) {
 			return new \Message\User\Create(
 				$c['user.current'],
@@ -29,7 +30,7 @@ class Services implements ServicesInterface
 				$c['event.dispatcher']
 				// $c['user.password_hash'] Is this needed at this level?
 			);
-		}
+		};
 
 		$services['user.edit'] = function($c) {
 			return new \Message\User\Edit(
