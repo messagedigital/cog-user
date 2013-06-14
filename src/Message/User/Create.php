@@ -29,13 +29,14 @@ class Create
 	 * @param DispatcherInterface	$eventDispatcher 	The event dispatcher
 	 *
 	 */
-	public function __construct(Loader $loader, DBQuery $query,
+	public function __construct(User $currentUser = null, Loader $loader, DBQuery $query,
 		DispatcherInterface $eventDispatcher, HashInterface $hash)
 	{
 		$this->_loader 			= $loader;
 		$this->_query			= $query;
 		$this->_eventDispatcher = $eventDispatcher;
 		$this->_hash			= $hash;
+		$this->_currentUser		= $currentUser;
 	}
 
 	/**
@@ -53,7 +54,7 @@ class Create
 	public function create(User $user, $password = null)
 	{
 
-		$hash->encrypt($password);
+		$password = $this->_hash->encrypt($password);
 
 		$result = $this->_query->run('
 			INSERT INTO
@@ -65,14 +66,16 @@ class Create
 				title 				= :title?s,
 				forename 			= :forename?s,
 				surname 			= :surname?s,
-				password 			= :password?sn
+				password 			= :password?sn,
+				created_by			= :created_by?sn
 		', array(
-			'email'				=> $user->getEmail,
-			'email_confirmed' 	=> $user->getEmailConfirmed,
-			'title'				=> $user->title,
-			'forename'			=> $user->forename,
-			'surname'			=> $user->surname,
-			'password'			=> $user->password
+				'email'				=> $user->getEmail,
+				'email_confirmed' 	=> $user->getEmailConfirmed,
+				'title'				=> $user->title,
+				'forename'			=> $user->forename,
+				'surname'			=> $user->surname,
+				'password'			=> $password,
+				'created_by'		=> $this->_currentUser
 		));
 
 		$userID = (int) $result->id();
