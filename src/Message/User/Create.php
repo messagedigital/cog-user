@@ -64,13 +64,15 @@ class Create
 				email_confirmed		= :email_confirmed?i,
 				title 				= :title?s,
 				forename 			= :forename?s,
-				surname 			= :surname?s
+				surname 			= :surname?s,
+				password 			= :password?sn
 		', array(
 			'email'				=> $user->getEmail,
 			'email_confirmed' 	=> $user->getEmailConfirmed,
 			'title'				=> $user->title,
 			'forename'			=> $user->forename,
-			'surname'			=> $user->surname
+			'surname'			=> $user->surname,
+			'password'			=> $user->password
 		));
 
 		$userID = (int) $result->id();
