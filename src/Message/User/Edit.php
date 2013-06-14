@@ -29,7 +29,7 @@ class Edit
 	 * @param User                $user            The currently logged in user
 	 */
 	public function __construct(DBQuery $query, DispatcherInterface $eventDispatcher,
-		HashInterface $hash, User $user)
+		HashInterface $hash, UserInterface $user)
 	{
 		$this->_query           = $query;
 		$this->_eventDispatcher = $eventDispatcher;
