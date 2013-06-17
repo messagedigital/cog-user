@@ -20,6 +20,8 @@ class Create
 	protected $_loader;
 	protected $_query;
 	protected $_eventDispatcher;
+	protected $_hash;
+	protected $_currentUser;
 
 	/**
 	 * Constructor.
