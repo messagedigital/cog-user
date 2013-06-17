@@ -1,6 +1,6 @@
 <?php 
 
-namespace Message\User\Create;
+namespace Message\User;
 
 use Message\User\User;
 use Message\User\Loader;
