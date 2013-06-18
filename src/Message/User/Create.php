@@ -58,8 +58,6 @@ class Create
 	public function create(User $user, $password = null)
 	{
 
-		var_dump($user);
-
 		$hashedPassword = $this->_hash->encrypt($password);
 
 		$user->authorship->update(new \Message\Cog\ValueObject\DateTimeImmutable, $this->_currentUser ? $this->_currentUser->id : null);
@@ -86,8 +84,8 @@ class Create
 				'surname'			=> $user->surname,
 				'password'			=> $hashedPassword,
 				'created_by'		=> $this->_currentUser->id,
-				'updated_by'		=> $user->authorship->updatedAt()->getTimestamp(),
-				'updated_by'		=> $user->authorship
+				'updated_at'		=> $user->authorship->updatedAt()->getTimestamp(),
+				'updated_by'		=> $user->authorship->updatedBy(),
 		));
 
 		$userID = (int) $result->id();
