@@ -15,7 +15,6 @@ use Message\Cog\Security\Hash\HashInterface;
  * Decorator for creating new users.
  *
  * @author Ewan Valentine <ewan@message.co.uk>
- *
  */
 class Create
 {	
@@ -59,9 +58,11 @@ class Create
 	public function create(User $user, $password = null)
 	{
 
-		$password = $this->_hash->encrypt($password);
+		var_dump($user);
 
-		$user->authorship->update(new DateTimeImmutable, $this->_currentUser ? $this->_currentUser->id : null);
+		$hashedPassword = $this->_hash->encrypt($password);
+
+		$user->authorship->update(new \Message\Cog\ValueObject\DateTimeImmutable, $this->_currentUser ? $this->_currentUser->id : null);
 
 		$result = $this->_query->run('
 			INSERT INTO
@@ -74,15 +75,19 @@ class Create
 				forename 			= :forename?s,
 				surname 			= :surname?s,
 				password 			= :password?sn,
-				created_by			= :created_by?sn
+				created_by			= :created_by?sn,
+				updated_by			= :updated_by?sn,
+				updated_at			= :updated_at?sn
 		', array(
 				'email'				=> $user->email,
 				'email_confirmed' 	=> $user->emailConfirmed,
 				'title'				=> $user->title,
 				'forename'			=> $user->forename,
 				'surname'			=> $user->surname,
-				'password'			=> $password,
-				'created_by'		=> $this->_currentUser->id
+				'password'			=> $hashedPassword,
+				'created_by'		=> $this->_currentUser->id,
+				'updated_by'		=> $user->authorship->updatedAt()->getTimestamp(),
+				'updated_by'		=> $user->authorship
 		));
 
 		$userID = (int) $result->id();
