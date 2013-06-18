@@ -27,8 +27,8 @@ class Services implements ServicesInterface
 				$c['user.current'],
 				$c['user.loader'],
 				$c['db.query'],
-				$c['event.dispatcher']
-				// $c['user.password_hash'] Is this needed at this level?
+				$c['event.dispatcher'],
+				$c['user.password_hash']
 			);
 		};
 

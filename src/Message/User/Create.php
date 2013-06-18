@@ -4,9 +4,12 @@ namespace Message\User;
 
 use Message\User\User;
 use Message\User\Loader;
+use Message\User\Event\Event;
 
 use Message\Cog\Event\DispatcherInterface;
 use Message\Cog\DB\Query as DBQuery;
+
+use Message\Cog\Security\Hash\HashInterface;
 
 /**
  * Decorator for creating new users.
@@ -32,7 +35,7 @@ class Create
 	 *
 	 */
 	public function __construct(User $currentUser = null, Loader $loader, DBQuery $query,
-		DispatcherInterface $eventDispatcher, HashInterface $hash)
+		DispatcherInterface $eventDispatcher, HashInterface $hash = null)
 	{
 		$this->_loader 			= $loader;
 		$this->_query			= $query;
@@ -58,6 +61,8 @@ class Create
 
 		$password = $this->_hash->encrypt($password);
 
+		$user->authorship->update(new DateTimeImmutable, $this->_currentUser ? $this->_currentUser->id : null);
+
 		$result = $this->_query->run('
 			INSERT INTO
 				user
@@ -71,18 +76,18 @@ class Create
 				password 			= :password?sn,
 				created_by			= :created_by?sn
 		', array(
-				'email'				=> $user->getEmail,
-				'email_confirmed' 	=> $user->getEmailConfirmed,
+				'email'				=> $user->email,
+				'email_confirmed' 	=> $user->emailConfirmed,
 				'title'				=> $user->title,
 				'forename'			=> $user->forename,
 				'surname'			=> $user->surname,
 				'password'			=> $password,
-				'created_by'		=> $this->_currentUser
+				'created_by'		=> $this->_currentUser->id
 		));
 
 		$userID = (int) $result->id();
 
-		$event = new Event($userID);
+		$event = new Event($user);
 
 		$this->_eventDispatcher->dispatch(
 			$event::CREATE,
