@@ -49,10 +49,6 @@ class Create
 	/**
 	 * Create a user.
 	 * 
-	 * The user object will be persisted to the database, 
-	 * deal with authorship
-	 * and trigger the event dispatcher.
-	 *
 	 * @param User 			$user 		The user object
 	 * @param $password 	Accepts a password as a parameter
 	 *
