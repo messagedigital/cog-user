@@ -1,18 +1,18 @@
 <form action="{{ url('user.login.action') }}" method="post">
-	<label for="login-email">Email</label>
+	<label for="login-email">{{ 'Email' }}</label>
 	<input type="email" name="login[email]" id="login-email">
 
-	<label for="login-password">Password</label>
+	<label for="login-password">{{ 'Password' }}</label>
 	<input type="password" name="login[password]" id="login-password">
 
 	{% if forgottenPasswordRoute is not null %}
-	<a class="forgotten-password" href="{{ url(forgottenPasswordRoute) }}">Forgotten your password?</a>
+	<a class="forgotten-password" href="{{ url(forgottenPasswordRoute) }}">{{ 'Forgotten your password?' }}</a>
 	{% endif %}
 
-	<label for="login-remember">Keep me logged in</label>
+	<label for="login-remember">{{ 'Keep me logged in' }}</label>
 	<input type="checkbox" name="login[remember]" id="login-remember" value="1">
 
 	<input type="hidden" name="login[redirect]" id="login-redirect" value="{{ redirectURL }}">
 
-	<button name="login[submit]" id="login-submit" type="submit" value="Log in">Log in</button>
+	<button name="login[submit]" id="login-submit" type="submit" value="{{ 'Log in' }}">Log in</button>
 </form>

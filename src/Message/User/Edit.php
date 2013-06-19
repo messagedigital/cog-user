@@ -27,10 +27,10 @@ class Edit
 	 * @param DBQuery             $query           The database query instance to use
 	 * @param DispatcherInterface $eventDispatcher The event dispatcher
 	 * @param HashInterface       $hash            Hash to use for user passwords
-	 * @param User|null           $user            The currently logged in user
+	 * @param User                $user            The currently logged in user
 	 */
 	public function __construct(DBQuery $query, DispatcherInterface $eventDispatcher,
-		HashInterface $hash, User $user = null)
+		HashInterface $hash, UserInterface $user)
 	{
 		$this->_query           = $query;
 		$this->_eventDispatcher = $eventDispatcher;
@@ -55,7 +55,11 @@ class Edit
 	{
 		$hashedPassword = $this->_passwordHash->encrypt($newPassword);
 
+<<<<<<< HEAD
 		$user->authorship->update(new DateTimeImmutable, $this->_currentUser ? $this->_currentUser->id : null);
+=======
+		$user->authorship->update(new \DateTime, $this->_currentUser->id);
+>>>>>>> refs/heads/master
 
 		$result = $this->_query->run('
 			UPDATE

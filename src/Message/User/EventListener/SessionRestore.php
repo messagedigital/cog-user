@@ -16,10 +16,13 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
  */
 class SessionRestore extends EventListener implements SubscriberInterface
 {
+	/**
+	 * {@inheritDoc}
+	 */
 	static public function getSubscribedEvents()
 	{
 		return array(KernelEvents::REQUEST => array(
-			array('restoreSessionFromCookie')
+			array('restoreSessionFromCookie', 900)
 		));
 	}
 
@@ -36,7 +39,7 @@ class SessionRestore extends EventListener implements SubscriberInterface
 	public function restoreSessionFromCookie(GetResponseEvent $event)
 	{
 		// Skip this if there is already a user logged in
-		if ($this->_services['user.current']) {
+		if (!($this->_services['user.current'] instanceof AnonymousUser)) {
 			return false;
 		}
 

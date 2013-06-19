@@ -22,7 +22,7 @@
 	"repositories": [
 		{
 			"type": "vcs",
-			"url" : "git@server.local:cog/cog.git"
+			"url" : "git@github.com:messagedigital/cog.git"
 		}
 	],
 	"require": {
