@@ -83,7 +83,7 @@ class Create
 				'forename'			=> $user->forename,
 				'surname'			=> $user->surname,
 				'password'			=> $hashedPassword,
-				'created_by'		=> $this->_currentUser->id,
+				'created_by'		=> $user->authorship->createdBy(),
 				'updated_at'		=> $user->authorship->updatedAt()->getTimestamp(),
 				'updated_by'		=> $user->authorship->updatedBy(),
 		));
