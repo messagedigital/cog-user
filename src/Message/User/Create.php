@@ -8,7 +8,7 @@ use Message\User\Event\Event;
 
 use Message\Cog\Event\DispatcherInterface;
 use Message\Cog\DB\Query as DBQuery;
-
+use Message\Cog\ValueObject\DateTimeImmutable;
 use Message\Cog\Security\Hash\HashInterface;
 
 /**
@@ -31,10 +31,13 @@ class Create
 	 * @param Loader 				$loader 			User loader
 	 * @param DBQuery 				$query 				The database query instance
 	 * @param DispatcherInterface	$eventDispatcher 	The event dispatcher
+	 * @param HashInterface			$hash 				For password hashing
+	 * @param UserInterface			$currentUser 		Sets UserInterface object for current user
 	 *
 	 */
-	public function __construct(User $currentUser = null, Loader $loader, DBQuery $query,
-		DispatcherInterface $eventDispatcher, HashInterface $hash = null)
+	public function __construct(Loader $loader, DBQuery $query,
+		DispatcherInterface $eventDispatcher, 
+		HashInterface $hash = null, User $currentUser = null)
 	{
 		$this->_loader 			= $loader;
 		$this->_query			= $query;
@@ -50,17 +53,15 @@ class Create
 	 * deal with authorship
 	 * and trigger the event dispatcher.
 	 *
-	 * @param User $user 		The user object
-	 * @param HashInterface		Instance of the hash component for optional password
+	 * @param User 			$user 		The user object
+	 * @param $password 	Accepts a password as a parameter
 	 *
-	 * return User
+	 * @return User
 	 */
 	public function create(User $user, $password = null)
 	{
 
 		$hashedPassword = $this->_hash->encrypt($password);
-
-		$user->authorship->update(new \Message\Cog\ValueObject\DateTimeImmutable, $this->_currentUser ? $this->_currentUser->id : null);
 
 		$result = $this->_query->run('
 			INSERT INTO
@@ -83,12 +84,11 @@ class Create
 				'forename'			=> $user->forename,
 				'surname'			=> $user->surname,
 				'password'			=> $hashedPassword,
-				'created_by'		=> $user->authorship->createdBy(),
-				'updated_at'		=> $user->authorship->updatedAt()->getTimestamp(),
-				'updated_by'		=> $user->authorship->updatedBy(),
+				'created_by'		=> $this->_currentUser
 		));
 
 		$userID = (int) $result->id();
+		$user = $this->_loader($userID);
 
 		$event = new Event($user);
 
