@@ -57,7 +57,7 @@ class Edit
 	{
 		$hashedPassword = $this->_passwordHash->encrypt($newPassword);
 
-		$user->authorship->update(new DateTimeImmutable, $this->_currentUser ? $this->_currentUser->id : null);
+		$user->authorship->update(new DateTimeImmutable, $this->_currentUser->id);
 
 		$result = $this->_query->run('
 			UPDATE
