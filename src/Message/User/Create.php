@@ -88,7 +88,7 @@ class Create
 		));
 
 		$userID = (int) $result->id();
-		$user = $this->_loader($userID);
+		$user = $this->_loader->getByID($userID);
 
 		$event = new Event($user);
 
