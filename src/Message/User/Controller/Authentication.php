@@ -25,7 +25,7 @@ class Authentication extends \Message\Cog\Controller\Controller
 	public function login($redirectURL = '/', $forgottenPasswordRoute = null)
 	{
 		return $this->render('::login', array(
-			'redirectURL'            => $redirectURL,
+			'form'                   => $this->_getLoginForm($redirectURL),
 			'forgottenPasswordRoute' => $forgottenPasswordRoute,
 		));
 	}
@@ -41,10 +41,14 @@ class Authentication extends \Message\Cog\Controller\Controller
 	 */
 	public function loginAction()
 	{
+		$form = $this->_getLoginForm();
+
 		// If no form data set on request, redirect the user back to referer
-		if (!$data = $this->get('request')->request->get('login')) {
+		if (!$form->isValid()) {
 			return $this->redirect($this->get('request')->headers->get('referer'));
 		}
+
+		$data = $form->getFilteredData();
 
 		$redirectURL = $data['redirect'];
 
@@ -126,5 +130,22 @@ class Authentication extends \Message\Cog\Controller\Controller
 		);
 
 		return $this->redirect($redirectURL);
+	}
+
+	protected function _getLoginForm($redirectURL = null)
+	{
+		$handler = $this->get('form.handler')
+			->setName('login')
+			->setAction($this->generateUrl('user.login.action'))
+			->setMethod('POST')
+			->setDefaultValues(array('redirect' => $redirectURL));
+
+		$handler->add('email', 'email')
+			->val()->email();
+		$handler->add('password', 'password');
+		$handler->add('redirect', 'hidden');
+		$handler->add('remember', 'checkbox');
+
+		return $handler;
 	}
 }
