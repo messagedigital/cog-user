@@ -2,9 +2,12 @@
 
 namespace Message\User;
 
+use Message\User\Event\Event;
+
 use Message\Cog\DB\Query as DBQuery;
 use Message\Cog\Event\DispatcherInterface;
 use Message\Cog\Security\Hash\HashInterface;
+use Message\Cog\ValueObject\DateTimeImmutable;
 
 use DateTime;
 
@@ -54,7 +57,7 @@ class Edit
 	{
 		$hashedPassword = $this->_passwordHash->encrypt($newPassword);
 
-		$user->authorship->update(new \DateTime, $this->_currentUser->id);
+		$user->authorship->update(new DateTimeImmutable, $this->_currentUser->id);
 
 		$result = $this->_query->run('
 			UPDATE
@@ -72,10 +75,10 @@ class Edit
 			'updatedBy' => $user->authorship->updatedBy(),
 		));
 
-		$event = new Event\Event($user);
+		$event = new Event($user);
 
 		$this->_eventDispatcher->dispatch(
-			Event\Event::PASSWORD_RESET,
+			$event::PASSWORD_RESET,
 			$event
 		);
 

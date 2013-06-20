@@ -27,6 +27,17 @@ class Services implements ServicesInterface
 			return new User\Loader($c['db.query']);
 		});
 
+
+		$services['user.create'] = function($c) {
+			return new \Message\User\Create(
+				$c['user.loader'],
+				$c['db.query'],
+				$c['event.dispatcher'],
+				$c['user.password_hash'],
+				$c['user.current']
+			);
+		};
+
 		$services['user.edit'] = function($c) {
 			return new User\Edit(
 				$c['db.query'],
