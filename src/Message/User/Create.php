@@ -59,9 +59,6 @@ class Create
 
 		$hashedPassword = $this->_hash->encrypt($password);
 
-		// var_dump($this->_currentUser);
-		// exit;
-
 		$result = $this->_query->run('
 			INSERT INTO
 				user
