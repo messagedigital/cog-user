@@ -48,7 +48,7 @@ class Create
 
 	/**
 	 * Create a user.
-	 * 
+	 * w
 	 * @param User 			$user 		The user object
 	 * @param $password 	Accepts a password as a parameter
 	 *
@@ -58,6 +58,9 @@ class Create
 	{
 
 		$hashedPassword = $this->_hash->encrypt($password);
+
+		// var_dump($this->_currentUser);
+		// exit;
 
 		$result = $this->_query->run('
 			INSERT INTO
@@ -80,10 +83,13 @@ class Create
 				'forename'			=> $user->forename,
 				'surname'			=> $user->surname,
 				'password'			=> $hashedPassword,
-				'created_by'		=> $this->_currentUser
+				'created_by'		=> $this->_currentUser->id
 		));
 
+
+
 		$userID = (int) $result->id();
+		
 		$user = $this->_loader->getByID($userID);
 
 		$event = new Event($user);
