@@ -54,7 +54,7 @@ class Edit
 	{
 		$hashedPassword = $this->_passwordHash->encrypt($newPassword);
 
-		$user->authorship->update(new \DateTimeImmutable, $this->_currentUser->id);
+		$user->authorship->update(new DateTimeImmutable, $this->_currentUser->id);
 
 		$result = $this->_query->run('
 			UPDATE
@@ -101,10 +101,10 @@ class Edit
 	 *
 	 * @return bool                True if the update was successful
 	 */
-	public function updateLastLoginTime(User $user, DateTime $time = null)
+	public function updateLastLoginTime(User $user, DateTimeImmutable $time = null)
 	{
 		if (!$time) {
-			$time = new DateTime;
+			$time = new DateTimeImmutable;
 		}
 
 		$result = $this->_query->run('
@@ -133,10 +133,10 @@ class Edit
 	 *
 	 * @return bool                True if the update was successful
 	 */
-	public function updatePasswordRequestTime(User $user, DateTime $time = null)
+	public function updatePasswordRequestTime(User $user, DateTimeImmutable $time = null)
 	{
 		if (!$time) {
-			$time = new DateTime;
+			$time = new DateTimeImmutable;
 		}
 
 		$result = $this->_query->run('

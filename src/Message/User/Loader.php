@@ -143,18 +143,18 @@ class Loader
 		$result->bind($user);
 
 		if ($data->lastLoginAt) {
-			$user->lastLoginAt = new DateTimeImmutable('@' . $data->lastLoginAt);
+			$user->lastLoginAt = new DateTimeImmutable('c', $data->lastLoginAt);
 		}
 
 		if ($data->passwordRequestAt) {
-			$user->passwordRequestAt = new DateTimeImmutable('@' . $data->passwordRequestAt);
+			$user->passwordRequestAt = new DateTimeImmutable('c', $data->passwordRequestAt);
 		}
 
 		$user->authorship = new Authorship;
-		$user->authorship->create(new DateTimeImmutable('@' . $data->created_at), $data->created_by);
+		$user->authorship->create(new DateTimeImmutable('c', $data->created_at), $data->created_by);
 
 		if ($data->updated_at) {
-			$user->authorship->update(new DateTimeImmutable('@' . $data->updated_at), $data->updated_by);
+			$user->authorship->update(new DateTimeImmutable('c', $data->updated_at), $data->updated_by);
 		}
 
 		return $user;
