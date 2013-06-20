@@ -6,7 +6,7 @@ use Message\Cog\DB\Query as DBQuery;
 use Message\Cog\Event\DispatcherInterface;
 use Message\Cog\Security\Hash\HashInterface;
 
-use DateTime;
+use Message\Cog\ValueObject\DateTimeImmutable;
 
 /**
  * Decorator class for editing users.
@@ -54,7 +54,7 @@ class Edit
 	{
 		$hashedPassword = $this->_passwordHash->encrypt($newPassword);
 
-		$user->authorship->update(new \DateTime, $this->_currentUser->id);
+		$user->authorship->update(new \DateTimeImmutable, $this->_currentUser->id);
 
 		$result = $this->_query->run('
 			UPDATE
