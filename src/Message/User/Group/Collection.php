@@ -73,6 +73,25 @@ class Collection implements \IteratorAggregate, \Countable
 	}
 
 	/**
+	 * Return a flattened array of the groups, where the key is the group name
+	 * and the value is the display name.
+	 *
+	 * This is helpful for use in choice menus.
+	 *
+	 * @return array The flattened array of groups.
+	 */
+	public function flatten()
+	{
+		$return = array();
+
+		foreach ($this->_groups as $group) {
+			$return[$group->getName()] = $group->getDisplayName();
+		}
+
+		return $return;
+	}
+
+	/**
 	 * Get the iterator object to use for iterating over this class.
 	 *
 	 * @return \ArrayIterator An \ArrayIterator instance for the `_groups`
