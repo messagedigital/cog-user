@@ -118,7 +118,7 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 		}
 
 		// If no form data set on request, redirect the user back to referer
-		if (!$data = $this->_services['request']->request->get('password_reset')) {
+		if (!$data = $form->getFilteredData()) {
 			return $this->redirect($this->get('request')->headers->get('referer'));
 		}
 

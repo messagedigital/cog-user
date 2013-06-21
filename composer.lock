@@ -129,7 +129,7 @@
             "source": {
                 "type": "git",
                 "url": "git@github.com:messagedigital/cog.git",
-                "reference": "79d7f7cd7ba7626df44610187847ed813b0e7374"
+                "reference": "3a2957a02ef82fb8e8a3bfbc2501ee176d07b712"
             },
             "require": {
                 "ext-curl": "*",
@@ -194,7 +194,7 @@
                 "wiki": "http://server.local/wiki/projects/cog",
                 "issues": "http://github.com/messagedigital/cog/issues"
             },
-            "time": "2013-06-21 10:50:25"
+            "time": "2013-06-21 14:42:35"
         },
         {
             "name": "mtdowling/cron-expression",
