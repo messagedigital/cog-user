@@ -26,8 +26,7 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 	public function request($resetRoute, $email = null)
 	{
 		return $this->render('::password/request', array(
-			'resetRoute' => $resetRoute,
-			'email'      => $email,
+			'form'       => $this->_getForgottenForm($resetRoute)
 		));
 	}
 
@@ -44,10 +43,14 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 	{
 		$redirect = $this->redirect($this->get('request')->headers->get('referer'));
 
+		$form = $this->_getForgottenForm();
+
 		// If no form data set on request, redirect the user back to referer
-		if (!$data = $this->_services['request']->request->get('password_request')) {
+		if (!$form->isValid()) {
 			return $redirect;
 		}
+
+		$data = $form->getFilteredData();
 
 		// Get the user
 		$user = $this->_services['user.loader']->getByEmail($data['email']);
@@ -55,7 +58,7 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 		// Throw error if user is not found
 		if (!$user) {
 			$this->addFlash('error', sprintf('Could not find user for email address `%s`', $data['email']));
-
+			exit;
 			return $redirect;
 		}
 
@@ -98,15 +101,21 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 		$this->_validateHash($user, $hash, $redirectURL);
 
 		return $this->render('::password/reset', array(
-			'email'       => $email,
-			'hash'        => $hash,
-			'redirectURL' => $redirectURL,
+			'form' => $this->_getResetForm($email, $hash, $redirectURL),
 		));
 	}
 
 	public function resetAction($email, $hash)
 	{
 		$user = $this->get('user.loader')->getByEmail($email);
+
+		$redirect = $this->redirect($this->get('request')->headers->get('referer'));
+
+		$form = $this->_getResetForm($email, $hash);
+
+		if (!$form->isValid()) {
+			return $redirect;
+		}
 
 		// If no form data set on request, redirect the user back to referer
 		if (!$data = $this->_services['request']->request->get('password_reset')) {
@@ -171,5 +180,50 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 		}
 
 		return true;
+	}
+
+	protected function _getForgottenForm($resetRoute = null)
+	{
+		$form = $this->get('form.handler');
+		$form->setAction($this->generateUrl('user.password.request.action'))
+			->setMethod('post')
+			->setName('forgotten')
+			->setDefaultValues(array(
+				'reset_route' => $resetRoute
+			));
+		$form->add('email', 'text', 'Email address')
+			->val()
+			->email();
+		$form->add('reset_route', 'hidden');
+
+		return $form;
+	}
+
+	protected function _getResetForm($email, $hash, $redirectURL = null)
+	{
+		$action = $this->generateUrl('user.password.reset.action', array(
+			'email' => $email,
+			'hash' => $hash,
+		));
+
+		$passwordMatch = function($var, $data) {
+			return ($var == $data['password']) ? true : false;
+		};
+
+		$form = $this->get('form.handler');
+		$form->setAction($action)
+			->setMethod('post')
+			->setName('reset')
+			->setDefaultValues(array(
+				'redirect' => $redirectURL
+			));
+		$form->add('password', 'password', 'New password');
+		$form->add('password_confirm', 'password', 'Confirm new password')
+			->val()
+			->rule($passwordMatch)
+			->error("\'%s\' must match \'Password\'");
+		$form->add('redirect', 'hidden');
+
+		return $form;
 	}
 }
