@@ -221,7 +221,7 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 		$form->add('password_confirm', 'password', 'Confirm new password')
 			->val()
 			->rule($passwordMatch)
-			->error("\'%s\' must match \'Password\'");
+			->error("'%s' must match 'Password'");
 		$form->add('redirect', 'hidden');
 
 		return $form;
