@@ -134,7 +134,7 @@ class Authentication extends \Message\Cog\Controller\Controller
 
 	protected function _getLoginForm($redirectURL = null)
 	{
-		$handler = $this->get('form.handler')
+		$handler = $this->get('form')
 			->setName('login')
 			->setAction($this->generateUrl('user.login.action'))
 			->setMethod('POST')
