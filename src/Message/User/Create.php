@@ -28,11 +28,11 @@ class Create
 	/**
 	 * Constructor.
 	 *
-	 * @param Loader 				$loader 			User loader
-	 * @param DBQuery 				$query 				The database query instance
-	 * @param DispatcherInterface	$eventDispatcher 	The event dispatcher
-	 * @param HashInterface			$hash 				For password hashing
-	 * @param UserInterface			$currentUser 		Sets UserInterface object for current user
+	 * @param Loader                $loader             User loader
+	 * @param DBQuery               $query              The database query instance
+	 * @param DispatcherInterface   $eventDispatcher    The event dispatcher
+	 * @param HashInterface         $hash               For password hashing
+	 * @param UserInterface         $currentUser        Sets UserInterface object for current user
 	 *
 	 */
 	public function __construct(Loader $loader, DBQuery $query,
@@ -48,15 +48,14 @@ class Create
 
 	/**
 	 * Create a user.
-	 * w
-	 * @param User 			$user 		The user object
-	 * @param $password 	Accepts a password as a parameter
+	 * 
+	 * @param User          $user       The user object
+	 * @param (string|null) $password 	Accepts a password as a parameter
 	 *
 	 * @return User
 	 */
-	public function create(User $user, $password = null)
+	public function create(UserInterface $user, $password = null)
 	{
-
 		$hashedPassword = $this->_hash->encrypt($password);
 
 		$result = $this->_query->run('

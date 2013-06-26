@@ -29,7 +29,7 @@ class Services implements ServicesInterface
 
 
 		$services['user.create'] = function($c) {
-			return new \Message\User\Create(
+			return new User\Create(
 				$c['user.loader'],
 				$c['db.query'],
 				$c['event.dispatcher'],
