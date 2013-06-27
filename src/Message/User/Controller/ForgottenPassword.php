@@ -4,7 +4,6 @@ namespace Message\User\Controller;
 
 use Message\User\User;
 use Message\User\Event;
-
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
@@ -17,11 +16,11 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 	/**
 	 * Render the password request form.
 	 *
-	 * @param  string $resetRoute Name of the route to use for the reset link
-	 *                            emailed to the user
-	 * @param  string $email      Default email address to pre-fill the form with
+	 * @param  string $resetRoute           Name of the route to use for the reset link
+	 *                                      emailed to the user
+	 * @param  string $email                Default email address to pre-fill the form with
 	 *
-	 * @return Response           The response object
+	 * @return \Message\Cog\HTTP\Response   The response object
 	 */
 	public function request($resetRoute, $email = null)
 	{
@@ -41,7 +40,7 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 	 */
 	public function requestAction()
 	{
-		$redirect = $this->redirect($this->get('request')->headers->get('referer'));
+		$redirect = $this->redirectToReferer();
 
 		$form = $this->_getForgottenForm();
 
@@ -94,6 +93,15 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 		return $redirect;
 	}
 
+	/**
+	 * Render the password reset form
+	 *
+	 * @param string $email                 User email address for password reset
+	 * @param string $hash                  Hash to determine user is correct and link is not expired
+	 * @param string $redirectURL           URL to redirect to once password has been reset
+	 *
+	 * @return \Message\Cog\HTTP\Response   The response object
+	 */
 	public function reset($email, $hash, $redirectURL = '/')
 	{
 		$user = $this->get('user.loader')->getByEmail($email);
@@ -105,35 +113,38 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 		));
 	}
 
+	/**
+	 * Run the password reset action, resetting the password to user submitted if valid
+	 *
+	 * @param string $email                             User email address for password reset
+	 * @param string $hash                              Hash to determine user is correct and link is not expired,
+	 *                                                  taken from email sent to user
+	 * @throws AccessDeniedHttpException                Throws exception if user does not exist
+	 *
+	 * @return \Message\Cog\HTTP\RedirectResponse       Redirect response object
+	 */
 	public function resetAction($email, $hash)
 	{
 		$user = $this->get('user.loader')->getByEmail($email);
-
-		$redirect = $this->redirect($this->get('request')->headers->get('referer'));
-
-		$form = $this->_getResetForm($email, $hash);
-
-		if (!$form->isValid()) {
-			return $redirect;
-		}
-
-		// If no form data set on request, redirect the user back to referer
-		if (!$data = $form->getFilteredData()) {
-			return $this->redirect($this->get('request')->headers->get('referer'));
-		}
-
-		$this->_validateHash($user, $hash, $data['redirect']);
 
 		// Check user exists
 		if (!$user) {
 			throw new AccessDeniedHttpException('User not found for this password reset request.');
 		}
 
-		// Check the passwords match
-		if ($data['password'] !== $data['password_confirm']) {
-			$this->addFlash('error', 'The entered passwords do not match: please try again.');
+		$form = $this->_getResetForm($email, $hash);
 
-			return $this->redirect($data['redirect']);
+		// Check form is valid and data can be collection
+		if (!$form->isValid() || (!$data = $form->getFilteredData())) {
+			return $this->redirectToReferer();
+		}
+
+		$this->_validateHash($user, $hash, $data['redirect']);
+
+		// Check passwords match
+		if ($data['password'] !== $data['confirm']) {
+			$this->addFlash('error', 'Your passwords do not match');
+			return $this->redirectToReferer();
 		}
 
 		// Change the password & clear the requested timestamp
@@ -150,6 +161,13 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 		return $this->redirect($data['redirect']);
 	}
 
+	/**
+	 * Create hash from user password request
+	 *
+	 * @param User $user        User requesting the password
+	 *
+	 * @return string           Returns hash
+	 */
 	protected function _generateHash(User $user)
 	{
 		$hash = new \Message\Cog\Security\Hash\SHA1($this->_services['security.salt']);
@@ -163,6 +181,15 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 		);
 	}
 
+	/**
+	 * Check that hash is valid and has not timed out
+	 *
+	 * @param User $user                    User from which hash was generated
+	 * @param string $hash                  Hash to validate
+	 * @throws AccessDeniedHttpException    Throws exception if hash is not valid, or if the reset link has expired
+	 *
+	 * @return bool                         Returns true if hash is valid
+	 */
 	protected function _validateHash(User $user, $hash)
 	{
 		// Check there is a password requested timestamp & the hash is correct
@@ -182,9 +209,16 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 		return true;
 	}
 
+	/**
+	 * Create form for password reset request
+	 *
+	 * @param string | null $resetRoute         Route to reset
+	 *
+	 * @return \Message\Cog\Form\Handler        Returns form handler (aka form)
+	 */
 	protected function _getForgottenForm($resetRoute = null)
 	{
-		$form = $this->get('form.handler');
+		$form = $this->get('form');
 		$form->setAction($this->generateUrl('user.password.request.action'))
 			->setMethod('post')
 			->setName('forgotten')
@@ -199,6 +233,15 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 		return $form;
 	}
 
+	/**
+	 * Create form for password reset
+	 *
+	 * @param string $email                 User email for password reset
+	 * @param string $hash                  Hash sent to user to validate password reset
+	 * @param string | null $redirectURL    URL to redirect upon validation of form
+	 *
+	 * @return \Message\Cog\Form\Handler    Returns form handler (aka form)
+	 */
 	protected function _getResetForm($email, $hash, $redirectURL = null)
 	{
 		$action = $this->generateUrl('user.password.reset.action', array(
@@ -206,11 +249,7 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 			'hash' => $hash,
 		));
 
-		$passwordMatch = function($var, $data) {
-			return ($var == $data['password']) ? true : false;
-		};
-
-		$form = $this->get('form.handler');
+		$form = $this->get('form');
 		$form->setAction($action)
 			->setMethod('post')
 			->setName('reset')
@@ -218,10 +257,7 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 				'redirect' => $redirectURL
 			));
 		$form->add('password', 'password', 'New password');
-		$form->add('password_confirm', 'password', 'Confirm new password')
-			->val()
-			->rule($passwordMatch)
-			->error("'%s' must match 'Password'");
+		$form->add('confirm', 'password', 'Confirm password');
 		$form->add('redirect', 'hidden');
 
 		return $form;

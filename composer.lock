@@ -129,11 +129,12 @@
             "source": {
                 "type": "git",
                 "url": "git@github.com:messagedigital/cog.git",
-                "reference": "3a2957a02ef82fb8e8a3bfbc2501ee176d07b712"
+                "reference": "87e49032c000ecd4a1829a0e33211c2f3e1415e4"
             },
             "require": {
                 "ext-curl": "*",
                 "ext-gd": "*",
+                "ext-intl": "*",
                 "ext-json": "*",
                 "ext-mysqli": "*",
                 "ext-simplexml": "*",
@@ -194,7 +195,7 @@
                 "wiki": "http://server.local/wiki/projects/cog",
                 "issues": "http://github.com/messagedigital/cog/issues"
             },
-            "time": "2013-06-21 14:42:35"
+            "time": "2013-06-26 15:15:27"
         },
         {
             "name": "mtdowling/cron-expression",
@@ -743,20 +744,21 @@
         },
         {
             "name": "symfony/icu",
-            "version": "v1.0.0",
+            "version": "v1.2.0",
             "target-dir": "Symfony/Component/Icu",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Icu.git",
-                "reference": "v1.0.0"
+                "reference": "v1.2.0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Icu/zipball/v1.0.0",
-                "reference": "v1.0.0",
+                "url": "https://api.github.com/repos/symfony/Icu/zipball/v1.2.0",
+                "reference": "v1.2.0",
                 "shasum": ""
             },
             "require": {
+                "lib-icu": ">=4.4",
                 "php": ">=5.3.3",
                 "symfony/intl": ">=2.3,<3.0"
             },
@@ -786,7 +788,7 @@
                 "icu",
                 "intl"
             ],
-            "time": "2013-06-03 18:32:07"
+            "time": "2013-06-03 18:32:58"
         },
         {
             "name": "symfony/intl",
