@@ -57,8 +57,8 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 		// Throw error if user is not found
 		if (!$user) {
 			$this->addFlash('error', sprintf('Could not find user for email address `%s`', $data['email']));
-			exit;
 			return $redirect;
+			exit;
 		}
 
 		// Update the "password requested at" timestamp
