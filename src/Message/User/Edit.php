@@ -7,7 +7,7 @@ use Message\Cog\Event\DispatcherInterface;
 use Message\Cog\Security\Hash\HashInterface;
 use Message\Cog\ValueObject\DateTimeImmutable;
 
-use DateTime;
+use Message\Cog\ValueObject\DateTimeImmutable;
 
 /**
  * Decorator class for editing users.
@@ -102,10 +102,10 @@ class Edit
 	 *
 	 * @return bool                True if the update was successful
 	 */
-	public function updateLastLoginTime(User $user, DateTime $time = null)
+	public function updateLastLoginTime(User $user, DateTimeImmutable $time = null)
 	{
 		if (!$time) {
-			$time = new DateTime;
+			$time = new DateTimeImmutable;
 		}
 
 		$result = $this->_query->run('
@@ -134,10 +134,10 @@ class Edit
 	 *
 	 * @return bool                True if the update was successful
 	 */
-	public function updatePasswordRequestTime(User $user, DateTime $time = null)
+	public function updatePasswordRequestTime(User $user, DateTimeImmutable $time = null)
 	{
 		if (!$time) {
-			$time = new DateTime;
+			$time = new DateTimeImmutable;
 		}
 
 		$result = $this->_query->run('
