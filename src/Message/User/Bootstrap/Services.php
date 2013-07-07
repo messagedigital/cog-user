@@ -59,5 +59,14 @@ class Services implements ServicesInterface
 		$services['user.permission.registry'] = $services->share(function() {
 			return new User\PermissionRegistry;
 		});
+
+		// Add a templating global for the current user
+		$services['templating.globals'] = $services->share($services->extend('templating.globals', function($globals) {
+			$globals->set('user', function($services) {
+				return $services['user.current'];
+			});
+
+			return $globals;
+		}));
 	}
 }
