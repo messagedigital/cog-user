@@ -37,7 +37,7 @@ class Create
 	 */
 	public function __construct(Loader $loader, DBQuery $query,
 		DispatcherInterface $eventDispatcher, 
-		HashInterface $hash = null, User $currentUser = null)
+		HashInterface $hash = null, UserInterface $currentUser = null)
 	{
 		$this->_loader 			= $loader;
 		$this->_query			= $query;
@@ -57,6 +57,8 @@ class Create
 	public function create(UserInterface $user, $password = null)
 	{
 		$hashedPassword = $this->_hash->encrypt($password);
+
+		$user->authorship->update(new \Message\Cog\ValueObject\DateTimeImmutable, $this->_currentUser ? $this->_currentUser->id : null);
 
 		$result = $this->_query->run('
 			INSERT INTO
@@ -79,10 +81,8 @@ class Create
 				'forename'			=> $user->forename,
 				'surname'			=> $user->surname,
 				'password'			=> $hashedPassword,
-				'created_by'		=> $this->_currentUser->id
+				'created_by'		=> $this->_currentUser->id,
 		));
-
-
 
 		$userID = (int) $result->id();
 		

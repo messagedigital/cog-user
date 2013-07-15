@@ -27,7 +27,6 @@ class Services implements ServicesInterface
 			return new User\Loader($c['db.query']);
 		});
 
-
 		$services['user.create'] = function($c) {
 			return new User\Create(
 				$c['user.loader'],
