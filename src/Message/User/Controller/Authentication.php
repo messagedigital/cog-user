@@ -144,7 +144,7 @@ class Authentication extends \Message\Cog\Controller\Controller
 			->val()->email();
 		$handler->add('password', 'password');
 		$handler->add('redirect', 'hidden');
-		$handler->add('remember', 'checkbox');
+		$handler->add('remember', 'checkbox')->val()->optional();
 
 		return $handler;
 	}
