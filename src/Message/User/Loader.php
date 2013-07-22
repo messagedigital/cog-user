@@ -113,6 +113,10 @@ class Loader
 	 */
 	protected function _load($id)
 	{
+		if (!$id) {
+			return false;
+		}
+
 		$result = $this->_query->run('
 			SELECT
 				user_id             AS id,
