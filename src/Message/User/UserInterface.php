@@ -16,10 +16,4 @@ interface UserInterface
 	 */
 	public function getName();
 
-	/**
-	 * Get user initials
-	 *
-	 * @return string
-	 */
-	public function getInitials();
 }
