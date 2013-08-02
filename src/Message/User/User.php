@@ -32,4 +32,14 @@ class User implements UserInterface
 	{
 		return $this->forename . ($this->surname ? ' ' . $this->surname : '');
 	}
+
+	/**
+	 * Get user initials
+	 *
+	 * @return string
+	 */
+	public function getInitials()
+	{
+		return ($this->forename[0] ?: '') . ($this->surname[0] ?: '');
+	}
 }
