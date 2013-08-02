@@ -38,6 +38,6 @@ class User implements UserInterface
 	 */
 	public function getInitials()
 	{
-		return ($this->forename[0] ?: '') . ($this->surname[0] ?: '');
+		return (substr($this->forename, 0, 1) ?: '') . (substr($this->surname[0], 0, 1) ?: '');
 	}
 }
