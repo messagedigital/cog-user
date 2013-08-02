@@ -34,9 +34,7 @@ class User implements UserInterface
 	}
 
 	/**
-	 * Get user initials
-	 *
-	 * @return string
+	 * {@inheritDoc}
 	 */
 	public function getInitials()
 	{
