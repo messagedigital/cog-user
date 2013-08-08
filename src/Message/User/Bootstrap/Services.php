@@ -36,6 +36,15 @@ class Services implements ServicesInterface
 			);
 		};
 
+		$services['user.create'] = function($c) {
+			return new User\Create(
+				$c['db.query'],
+				$c['event.dispatcher'],
+				$c['user.password_hash'],
+				$c['user.current']
+			);
+		};
+
 		$services['user.password_hash'] = $services->share(function($c) {
 			return new \Message\Cog\Security\Hash\Bcrypt($c['security.salt']);
 		});

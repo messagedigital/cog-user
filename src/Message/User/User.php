@@ -2,6 +2,8 @@
 
 namespace Message\User;
 
+use \Message\Cog\ValueObject\Authorship;
+
 /**
  * A simple implementation of a basic user model.
  *
@@ -24,6 +26,11 @@ class User implements UserInterface
 
 	public $lastLoginAt;
 	public $passwordRequestAt;
+
+	public function __construct()
+	{
+		$this->authorship = new Authorship;
+	}
 
 	/**
 	 * {@inheritDoc}

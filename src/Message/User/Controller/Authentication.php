@@ -24,7 +24,8 @@ class Authentication extends \Message\Cog\Controller\Controller
 	 */
 	public function login($redirectURL = '/', $forgottenPasswordRoute = null)
 	{
-		return $this->render('::login', array(
+
+		return $this->render('Message:User::login', array(
 			'form'                   => $this->_getLoginForm($redirectURL),
 			'forgottenPasswordRoute' => $forgottenPasswordRoute,
 		));
