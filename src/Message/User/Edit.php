@@ -38,9 +38,47 @@ class Edit
 		$this->_currentUser     = $user;
 	}
 
+	/**
+	 * Change the user details for a given user.
+	 *
+	 * @param  User   $user        	The user to change the details for
+	 * @param  string $newTitle 	
+	 * @param  string $newForename	
+	 * @param  string $newSurname	
+	 * @param  string $newEmail		
+	 *
+	 * @return User                The user that was updated
+	 *
+	 * @author Eleanor Shakeshaft 
+	 */
 	public function save(User $user)
 	{
+		$user->authorship->update(new DateTimeImmutable, $this->_currentUser->id);
 
+		$result = $this->_query->run('
+			UPDATE 
+				user
+			SET
+				title 	   = :title?s,
+				forename   = :forename?s,
+				surname    = :surname?s,
+				email      = :email?s,
+				updated_at = :updatedAt?d,
+				updated_by = :updatedBy?in
+			WHERE
+				user_id = :userID?i
+		', array(
+			'userID'	=> $user->id,
+			'forename'	=> $user->forename,
+			'surname'	=> $user->surname,
+			'email'		=> $user->email,
+			'updatedAt'	=> $user->authorship->updatedAt(),
+			'updatedBy'	=> $user->authorship->updatedBy(),
+		));
+
+		$event = new Event\Event($user);
+
+		return $event->getUser();
 	}
 
 	/**
@@ -62,14 +100,14 @@ class Edit
 				user
 			SET
 				password   = :password?s,
-				updated_at = :updatedAt?i,
+				updated_at = :updatedAt?d,
 				updated_by = :updatedBy?in
 			WHERE
 				user_id = :userID?i
 		', array(
 			'userID'    => $user->id,
 			'password'  => $hashedPassword,
-			'updatedAt' => $user->authorship->updatedAt()->getTimestamp(),
+			'updatedAt' => $user->authorship->updatedAt(),
 			'updatedBy' => $user->authorship->updatedBy(),
 		));
 
