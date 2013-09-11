@@ -42,21 +42,21 @@ class Edit
 	 * Change the user details for a given user.
 	 *
 	 * @param  User   $user        	The user to change the details for
-	 * @param  string $newTitle 	
-	 * @param  string $newForename	
-	 * @param  string $newSurname	
-	 * @param  string $newEmail		
+	 * @param  string $newTitle
+	 * @param  string $newForename
+	 * @param  string $newSurname
+	 * @param  string $newEmail
 	 *
 	 * @return User                The user that was updated
 	 *
-	 * @author Eleanor Shakeshaft 
+	 * @author Eleanor Shakeshaft
 	 */
 	public function save(User $user)
 	{
 		$user->authorship->update(new DateTimeImmutable, $this->_currentUser->id);
 
 		$result = $this->_query->run('
-			UPDATE 
+			UPDATE
 				user
 			SET
 				title 	   = :title?s,
@@ -69,6 +69,7 @@ class Edit
 				user_id = :userID?i
 		', array(
 			'userID'	=> $user->id,
+			'title' 	=> $user->title,
 			'forename'	=> $user->forename,
 			'surname'	=> $user->surname,
 			'email'		=> $user->email,
@@ -162,6 +163,7 @@ class Edit
 
 		return (bool) $result->affected();
 	}
+
 
 	/**
 	 * Update the "password requested at" timestamp for a given user in the
