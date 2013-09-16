@@ -8,6 +8,7 @@ use Message\Cog\Security\Hash\HashInterface;
 use Message\Cog\ValueObject\DateTimeImmutable;
 
 use DateTime;
+use InvalidArgumentException;
 
 /**
  * Decorator class for editing users.
@@ -20,6 +21,7 @@ class Edit
 	protected $_eventDispatcher;
 	protected $_passwordHash;
 	protected $_currentUser;
+	protected $_groups;
 
 	/**
 	 * Constructor.
@@ -30,12 +32,13 @@ class Edit
 	 * @param User                $user            The currently logged in user
 	 */
 	public function __construct(DBQuery $query, DispatcherInterface $eventDispatcher,
-		HashInterface $hash, UserInterface $user)
+		HashInterface $hash, UserInterface $user, Group\Collection $groups)
 	{
 		$this->_query           = $query;
 		$this->_eventDispatcher = $eventDispatcher;
 		$this->_passwordHash    = $hash;
 		$this->_currentUser     = $user;
+		$this->_groups          = $groups;
 	}
 
 	/**
@@ -193,7 +196,7 @@ class Edit
 
 		// Get the groups from the collection, ensuring they are valid
 		foreach ($groups as $i => $groupName) {
-			$groups[$i] = $this->get('user.groups')->get($groupName);
+			$groups[$i] = $this->_groups->get($groupName);
 		}
 
 		// Remove user from all groups
