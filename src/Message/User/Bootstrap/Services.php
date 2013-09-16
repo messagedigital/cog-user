@@ -32,7 +32,8 @@ class Services implements ServicesInterface
 				$c['db.query'],
 				$c['event.dispatcher'],
 				$c['user.password_hash'],
-				$c['user.current']
+				$c['user.current'],
+				$c['user.groups']
 			);
 		};
 

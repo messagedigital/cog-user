@@ -24,7 +24,7 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 	 */
 	public function request($resetRoute, $email = null)
 	{
-		return $this->render('::password/request', array(
+		return $this->render('Message:User::password/request', array(
 			'form'       => $this->_getForgottenForm($resetRoute)
 		));
 	}
@@ -108,7 +108,7 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 
 		$this->_validateHash($user, $hash, $redirectURL);
 
-		return $this->render('::password/reset', array(
+		return $this->render('Message:User::password/reset', array(
 			'form' => $this->_getResetForm($email, $hash, $redirectURL),
 		));
 	}

@@ -40,7 +40,7 @@ class Create
 
 	public function save(User $user)
 	{
-		$user->authorship->create(new DateTimeImmutable, $this->_currentUser);
+		$user->authorship->create(new DateTimeImmutable, $this->_currentUser->id);
 		$user->password = $this->_passwordHash->encrypt($user->password);
 
 		$result = $this->_query->run(
@@ -52,15 +52,15 @@ class Create
 				surname    = :surname?s,
 				title      = :title?s,
 				password   = :password?s,
-				created_by = :created_by?in,
-				created_at = :created_at?i',
-			array(
+				created_by = :created_by?i,
+				created_at = :created_at?i
+			', array(
 				'email'      => $user->email,
 				'forename'   => $user->forename,
 				'surname'    => $user->surname,
 				'title'      => $user->title,
 				'password'   => $user->password,
-				'created_by' => $user->authorship->createdBy()->id,
+				'created_by' => $user->authorship->createdBy(),
 				'created_at' => $user->authorship->createdAt(),
 			)
 		);

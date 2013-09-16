@@ -8,6 +8,7 @@ use Message\Cog\Security\Hash\HashInterface;
 use Message\Cog\ValueObject\DateTimeImmutable;
 
 use DateTime;
+use InvalidArgumentException;
 
 /**
  * Decorator class for editing users.
@@ -20,6 +21,7 @@ class Edit
 	protected $_eventDispatcher;
 	protected $_passwordHash;
 	protected $_currentUser;
+	protected $_groups;
 
 	/**
 	 * Constructor.
@@ -30,33 +32,34 @@ class Edit
 	 * @param User                $user            The currently logged in user
 	 */
 	public function __construct(DBQuery $query, DispatcherInterface $eventDispatcher,
-		HashInterface $hash, UserInterface $user)
+		HashInterface $hash, UserInterface $user, Group\Collection $groups)
 	{
 		$this->_query           = $query;
 		$this->_eventDispatcher = $eventDispatcher;
 		$this->_passwordHash    = $hash;
 		$this->_currentUser     = $user;
+		$this->_groups          = $groups;
 	}
 
 	/**
 	 * Change the user details for a given user.
 	 *
 	 * @param  User   $user        	The user to change the details for
-	 * @param  string $newTitle 	
-	 * @param  string $newForename	
-	 * @param  string $newSurname	
-	 * @param  string $newEmail		
+	 * @param  string $newTitle
+	 * @param  string $newForename
+	 * @param  string $newSurname
+	 * @param  string $newEmail
 	 *
 	 * @return User                The user that was updated
 	 *
-	 * @author Eleanor Shakeshaft 
+	 * @author Eleanor Shakeshaft
 	 */
 	public function save(User $user)
 	{
 		$user->authorship->update(new DateTimeImmutable, $this->_currentUser->id);
 
 		$result = $this->_query->run('
-			UPDATE 
+			UPDATE
 				user
 			SET
 				title 	   = :title?s,
@@ -69,6 +72,7 @@ class Edit
 				user_id = :userID?i
 		', array(
 			'userID'	=> $user->id,
+			'title' 	=> $user->title,
 			'forename'	=> $user->forename,
 			'surname'	=> $user->surname,
 			'email'		=> $user->email,
@@ -121,14 +125,106 @@ class Edit
 		return $event->getUser();
 	}
 
+	/**
+	 * Add a user to a group.
+	 *
+	 * @param User                $user
+	 * @param GroupGroupInterface $group
+	 *
+	 * @return bool
+	 */
 	public function addToGroup(User $user, Group\GroupInterface $group)
 	{
+		// Check the user has an id
+		if (! $user->id) {
+			throw new InvalidArgumentException('User id %s is not valid', $user->id);
+		}
 
+		$this->_query->run('
+			REPLACE INTO
+				user_group
+			SET
+				user_id = ?i,
+				group_name = ?s
+		', array(
+			$user->id,
+			$group->getName(),
+		));
 	}
 
+	/**
+	 * Remove a user from a group.
+	 *
+	 * @param  User                $user
+	 * @param  GroupGroupInterface $group
+	 *
+	 * @return bool
+	 */
 	public function removeFromGroup(User $user, Group\GroupInterface $group)
 	{
+		// Check the user has an id
+		if (! $user->id) {
+			throw new InvalidArgumentException('User id %s is not valid', $user->id);
+		}
 
+		$this->_query->run('
+			DELETE FROM
+				user_group
+			WHERE
+				user_id = ?i,
+				group_name = ?s
+		', array(
+			$user->id,
+			$group->getName()
+		));
+	}
+
+	/**
+	 * Set the user's groups.
+	 *
+	 * @param User  $user
+	 * @param array $groups
+	 *
+	 * @return bool
+	 */
+	public function setGroups(User $user, array $groups)
+	{
+		// Check the user has an id
+		if (! $user->id) {
+			throw new InvalidArgumentException('User id %s is not valid', $user->id);
+		}
+
+		// Get the groups from the collection, ensuring they are valid
+		foreach ($groups as $i => $groupName) {
+			$groups[$i] = $this->_groups->get($groupName);
+		}
+
+		// Remove user from all groups
+		$this->_query->run('
+			DELETE FROM
+				user_group
+			WHERE
+				user_id = ?i
+		', $user->id);
+
+		// Add user to chosen groups
+		$insertQuery = '';
+		$insertValues = array();
+		foreach ($groups as $group) {
+			$insertQuery .= '(?i, ?s),';
+			$insertValues[] = $user->id;
+			$insertValues[] = $group->getName();
+		}
+		$insertQuery = substr($insertQuery, 0, -1);
+
+		$this->_query->run('
+			INSERT INTO
+				user_group (`user_id`, `group_name`)
+			VALUES
+				' . $insertQuery . '
+		', $insertValues);
+
+		return true;
 	}
 
 	/**
@@ -162,6 +258,7 @@ class Edit
 
 		return (bool) $result->affected();
 	}
+
 
 	/**
 	 * Update the "password requested at" timestamp for a given user in the
