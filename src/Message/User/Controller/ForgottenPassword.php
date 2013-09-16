@@ -108,7 +108,7 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 
 		$this->_validateHash($user, $hash, $redirectURL);
 
-		return $this->render('::password/reset', array(
+		return $this->render('Message:User::password/reset', array(
 			'form' => $this->_getResetForm($email, $hash, $redirectURL),
 		));
 	}
