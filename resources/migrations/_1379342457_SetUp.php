@@ -2,11 +2,11 @@
 
 use Message\Cog\Migration\Adapter\MySQL\Migration;
 
-class 1379342457_SetUp extends Migration
+class _1379342457_SetUp extends Migration
 {
 	public function up()
 	{
-		$this->run('
+		$this->run("
 			CREATE TABLE IF NOT EXISTS `user` (
 			  `user_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
 			  `created_at` int(11) unsigned DEFAULT NULL,
@@ -27,9 +27,9 @@ class 1379342457_SetUp extends Migration
 			  KEY `updated_by` (`updated_by`),
 			  KEY `email_confirmed` (`email_confirmed`)
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-		');
+		");
 
-		$this->run('
+		$this->run("
 			CREATE TABLE IF NOT EXISTS `user_group` (
 			  `user_id` int(11) unsigned NOT NULL,
 			  `group_name` varchar(255) NOT NULL DEFAULT '',
@@ -37,7 +37,7 @@ class 1379342457_SetUp extends Migration
 			  KEY `user_id` (`user_id`),
 			  KEY `group_name` (`group_name`)
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-		');
+		");
 	}
 
 	public function down()
