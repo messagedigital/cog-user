@@ -122,14 +122,106 @@ class Edit
 		return $event->getUser();
 	}
 
+	/**
+	 * Add a user to a group.
+	 *
+	 * @param User                $user
+	 * @param GroupGroupInterface $group
+	 *
+	 * @return bool
+	 */
 	public function addToGroup(User $user, Group\GroupInterface $group)
 	{
+		// Check the user has an id
+		if (! $user->id) {
+			throw new InvalidArgumentException('User id %s is not valid', $user->id);
+		}
 
+		$this->_query->run('
+			REPLACE INTO
+				user_group
+			SET
+				user_id = ?i,
+				group_name = ?s
+		', array(
+			$user->id,
+			$group->getName(),
+		));
 	}
 
+	/**
+	 * Remove a user from a group.
+	 *
+	 * @param  User                $user
+	 * @param  GroupGroupInterface $group
+	 *
+	 * @return bool
+	 */
 	public function removeFromGroup(User $user, Group\GroupInterface $group)
 	{
+		// Check the user has an id
+		if (! $user->id) {
+			throw new InvalidArgumentException('User id %s is not valid', $user->id);
+		}
 
+		$this->_query->run('
+			DELETE FROM
+				user_group
+			WHERE
+				user_id = ?i,
+				group_name = ?s
+		', array(
+			$user->id,
+			$group->getName()
+		));
+	}
+
+	/**
+	 * Set the user's groups.
+	 *
+	 * @param User  $user
+	 * @param array $groups
+	 *
+	 * @return bool
+	 */
+	public function setGroups(User $user, array $groups)
+	{
+		// Check the user has an id
+		if (! $user->id) {
+			throw new InvalidArgumentException('User id %s is not valid', $user->id);
+		}
+
+		// Get the groups from the collection, ensuring they are valid
+		foreach ($groups as $i => $groupName) {
+			$groups[$i] = $this->get('user.groups')->get($groupName);
+		}
+
+		// Remove user from all groups
+		$this->_query->run('
+			DELETE FROM
+				user_group
+			WHERE
+				user_id = ?i
+		', $user->id);
+
+		// Add user to chosen groups
+		$insertQuery = '';
+		$insertValues = array();
+		foreach ($groups as $group) {
+			$insertQuery .= '(?i, ?s),';
+			$insertValues[] = $user->id;
+			$insertValues[] = $group->getName();
+		}
+		$insertQuery = substr($insertQuery, 0, -1);
+
+		$this->_query->run('
+			INSERT INTO
+				user_group (`user_id`, `group_name`)
+			VALUES
+				' . $insertQuery . '
+		', $insertValues);
+
+		return true;
 	}
 
 	/**
