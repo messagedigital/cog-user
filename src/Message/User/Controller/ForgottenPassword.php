@@ -24,7 +24,7 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 	 */
 	public function request($resetRoute, $email = null)
 	{
-		return $this->render('::password/request', array(
+		return $this->render('Message:User::password/request', array(
 			'form'       => $this->_getForgottenForm($resetRoute)
 		));
 	}
