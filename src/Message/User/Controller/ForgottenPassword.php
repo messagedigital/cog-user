@@ -33,7 +33,6 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 	 * Run the password request action, emailing the user a secure & unique link
 	 * to use to reset their password.
 	 *
-	 * @todo implement email component when built
 	 * @todo update password requested at timestamp within event listener??
 	 *
 	 * @return Response           The response object
@@ -41,8 +40,7 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 	public function requestAction()
 	{
 		$redirect = $this->redirectToReferer();
-
-		$form = $this->_getForgottenForm();
+		$form     = $this->_getForgottenForm();
 
 		// If no form data set on request, redirect the user back to referer
 		if (!$form->isValid()) {
@@ -68,26 +66,35 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 		$hash = $this->_generateHash($user);
 
 		// Email it to the user
-		mail(
-			$data['email'],
-			'Password request token',
-			$this->generateUrl($data['reset_route'], array(
+		$message = $this->get('mail.message');
+		$message->setSubject('Password request token');
+		$message->setTo($data['email'], $user->getName());
+		$message->setView('::mail/password-request', $params = array(
+			'reset_link' => $this->generateUrl($data['reset_route'], array(
 				'email' => $data['email'],
 				'hash'  => $hash,
-			), true)
-		);
-
-		// Dispatch password request event
-		$this->get('event.dispatcher')->dispatch(
-			Event\Event::PASSWORD_REQUEST,
-			new Event\Event($user)
-		);
-
-		// Give positive feedback
-		$this->addFlash('success', sprintf(
-			'We\'ve emailed you a secure link to use to reset your password. It will expire in %s.',
-			$this->get('cfg')->user->forgottenPasswordExpiry
+			), true),
+			'user'     => $user,
+			'email'    => $data['email'],
+			'base_url' => $this->get('request')->getHttpHost(),
 		));
+
+		if ($this->get('mail.dispatcher')->send($message)) {
+			// Dispatch password request event
+			$this->get('event.dispatcher')->dispatch(
+				Event\Event::PASSWORD_REQUEST,
+				new Event\Event($user)
+			);
+
+			// Give positive feedback
+			$this->addFlash('success', sprintf(
+				'We\'ve emailed you a secure link to use to reset your password. It will expire in %s.',
+				$this->get('cfg')->user->forgottenPasswordExpiry
+			));
+		}
+		else {
+			$this->addFlash('error', 'The password reset email failed to send, please try again.');
+		}
 
 		// Redirect to referer
 		return $redirect;
