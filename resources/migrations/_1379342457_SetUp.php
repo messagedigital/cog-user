@@ -2,7 +2,7 @@
 
 use Message\Cog\Migration\Adapter\MySQL\Migration;
 
-class _1379342457_SetUp extends Migration
+class _1379408417_SetUp extends Migration
 {
 	public function up()
 	{
