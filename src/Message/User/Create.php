@@ -40,6 +40,11 @@ class Create
 
 	public function save(User $user)
 	{
+		return $this->create($user);
+	}
+
+	public function create(User $user)
+	{
 		$user->authorship->create(new DateTimeImmutable, $this->_currentUser->id);
 		$user->password = $this->_passwordHash->encrypt($user->password);
 
