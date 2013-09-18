@@ -89,6 +89,33 @@ class Loader
 
 	}
 
+	public function getBySearchTerm($term)
+	{
+		$result = $this->_query->run('
+			SELECT
+				user_id
+			FROM
+				user
+			WHERE
+				email LIKE :term?s OR
+				forename LIKE :term?s OR
+				surname LIKE :term?s
+		', array(
+			'term' => '%' . $term . '%'
+		));
+
+		if (! $result or count($result) == 0) {
+			return array();
+		}
+
+		$return = array_filter(array_map(
+			array($this, '_load'),
+			$result->flatten('user_id')
+		));
+
+		return $return;
+	}
+
 	public function getUserPassword(User $user)
 	{
 		$result = $this->_query->run('
