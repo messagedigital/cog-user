@@ -24,7 +24,6 @@ class Authentication extends \Message\Cog\Controller\Controller
 	 */
 	public function login($redirectURL = '/', $forgottenPasswordRoute = null)
 	{
-
 		return $this->render('Message:User::login', array(
 			'form'                   => $this->_getLoginForm($redirectURL),
 			'forgottenPasswordRoute' => $forgottenPasswordRoute,
@@ -102,33 +101,36 @@ class Authentication extends \Message\Cog\Controller\Controller
 	 * Logs the currently logged in user out, clearing their session and cookie
 	 * (if set).
 	 *
-	 * @param string $redirectURL The URL to redirect to after successful login
+	 * @param  string|null $redirectURL The URL to redirect to after successful
+	 *                                  login, or null to redirect to referer
 	 *
 	 * @return Response The response object
 	 */
-	public function logoutAction($redirectURL = '/')
+	public function logoutAction($redirectURL = null)
 	{
 		$user = $this->get('user.current');
 
-		// If the user is already logged out, send them straight on
-		if ($user instanceof AnonymousUser) {
-			return $this->redirect($redirectURL);
+		// Only log out the user if they are actually logged in!
+		if (!$user instanceof AnonymousUser) {
+			// Clear the session
+			$this->get('http.session')->remove($this->get('cfg')->user->sessionName);
+			// Clear the cookie
+			$this->get('http.cookies')->add(new Cookie(
+				$this->get('cfg')->user->cookieName,
+				null,
+				1
+			));
+
+			// Fire the user logout event
+			$this->get('event.dispatcher')->dispatch(
+				Event\Event::LOGOUT,
+				new Event\Event($user)
+			);
 		}
 
-		// Clear the session
-		$this->get('http.session')->remove($this->get('cfg')->user->sessionName);
-		// Clear the cookie
-		$this->get('http.cookies')->add(new Cookie(
-			$this->get('cfg')->user->cookieName,
-			null,
-			1
-		));
-
-		// Fire the user logout event
-		$this->get('event.dispatcher')->dispatch(
-			Event\Event::LOGOUT,
-			new Event\Event($user)
-		);
+		if (null === $redirectURL) {
+			return $this->redirectToReferer();
+		}
 
 		return $this->redirect($redirectURL);
 	}
