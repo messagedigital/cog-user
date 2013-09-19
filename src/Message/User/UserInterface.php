@@ -15,5 +15,4 @@ interface UserInterface
 	 * @return string The user's full name
 	 */
 	public function getName();
-
 }

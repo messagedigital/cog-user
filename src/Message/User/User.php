@@ -41,10 +41,20 @@ class User implements UserInterface
 	}
 
 	/**
+	 * Get the user's full name, with their title prepended (if there is one).
+	 *
+	 * @return string
+	 */
+	public function getNameWithTitle()
+	{
+		return ($this->title ? $this->title . ' ' : '') . $this->getName();
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public function getInitials()
 	{
-		return (substr($this->forename, 0, 1) ?: '') . (substr($this->surname[0], 0, 1) ?: '');
+		return (substr($this->forename, 0, 1) ?: '') . (substr($this->surname, 0, 1) ?: '');
 	}
 }
