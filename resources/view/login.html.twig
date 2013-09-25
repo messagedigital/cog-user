@@ -3,11 +3,11 @@
 {{ form_row(form.email, {label: 'Email address'}) }}
 {{ form_row(form.password) }}
 
+{{ form_row(form.remember, {label: 'Keep me logged in'}) }}
+
 {% if forgottenPasswordRoute is not null %}
 <a class="forgotten-password" href="{{ url(forgottenPasswordRoute) }}">{{ 'Forgotten your password?' }}</a>
 {% endif %}
-
-{{ form_row(form.remember, {label: 'Keep me logged in'}) }}
 
 {{ form_rest(form) }}
 
