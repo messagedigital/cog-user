@@ -22,10 +22,10 @@ class Authentication extends \Message\Cog\Controller\Controller
 	 *
 	 * @return Response           The response object
 	 */
-	public function login($redirectURL = '/', $forgottenPasswordRoute = null)
+	public function login($redirectURL = '/', $forgottenPasswordRoute = null, array $inputAttributes = array())
 	{
 		return $this->render('Message:User::login', array(
-			'form'                   => $this->_getLoginForm($redirectURL),
+			'form'                   => $this->_getLoginForm($redirectURL, $inputAttributes),
 			'forgottenPasswordRoute' => $forgottenPasswordRoute,
 		));
 	}
@@ -135,7 +135,7 @@ class Authentication extends \Message\Cog\Controller\Controller
 		return $this->redirect($redirectURL);
 	}
 
-	protected function _getLoginForm($redirectURL = null)
+	protected function _getLoginForm($redirectURL = null, array $inputAttributes = array())
 	{
 		$handler = $this->get('form')
 			->setName('login')
@@ -143,11 +143,22 @@ class Authentication extends \Message\Cog\Controller\Controller
 			->setMethod('POST')
 			->setDefaultValues(array('redirect' => $redirectURL));
 
-		$handler->add('email', 'email')
+		$handler->add('email', 'email', 'Email address', array(
+			'attr' => (array_key_exists('email', $inputAttributes)) ? $inputAttributes['email'] : array(),
+		))
 			->val()->email();
-		$handler->add('password', 'password');
-		$handler->add('redirect', 'hidden');
-		$handler->add('remember', 'checkbox')->val()->optional();
+
+		$handler->add('password', 'password', 'Password', array(
+			'attr' => (array_key_exists('password', $inputAttributes)) ? $inputAttributes['password'] : array(),
+		));
+
+		$handler->add('redirect', 'hidden', '', array(
+			'attr' => (array_key_exists('redirect', $inputAttributes)) ? $inputAttributes['redirect'] : array(),
+		));
+
+		$handler->add('remember', 'checkbox', 'Keep me logged in', array(
+			'attr' => (array_key_exists('remember', $inputAttributes)) ? $inputAttributes['remember'] : array(),
+		))->val()->optional();
 
 		return $handler;
 	}
