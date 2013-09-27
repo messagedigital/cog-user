@@ -22,10 +22,10 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 	 *
 	 * @return \Message\Cog\HTTP\Response   The response object
 	 */
-	public function request($resetRoute, $email = null)
+	public function request($resetRoute, $email = null, array $inputAttributes = array())
 	{
 		return $this->render('Message:User::password/request', array(
-			'form'       => $this->_getForgottenForm($resetRoute)
+			'form' => $this->_getForgottenForm($resetRoute, $inputAttributes)
 		));
 	}
 
@@ -109,14 +109,14 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 	 *
 	 * @return \Message\Cog\HTTP\Response   The response object
 	 */
-	public function reset($email, $hash, $redirectURL = '/')
+	public function reset($email, $hash, $redirectURL = '/', array $inputAttributes = array())
 	{
 		$user = $this->get('user.loader')->getByEmail($email);
 
 		$this->_validateHash($user, $hash, $redirectURL);
 
 		return $this->render('Message:User::password/reset', array(
-			'form' => $this->_getResetForm($email, $hash, $redirectURL),
+			'form' => $this->_getResetForm($email, $hash, $redirectURL, $inputAttributes),
 		));
 	}
 
@@ -219,11 +219,12 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 	/**
 	 * Create form for password reset request
 	 *
-	 * @param string | null $resetRoute         Route to reset
+	 * @param string|null $resetRoute      Route to reset
+	 * @param array       $inputAttributes Array of custom attributes for each input
 	 *
-	 * @return \Message\Cog\Form\Handler        Returns form handler (aka form)
+	 * @return \Message\Cog\Form\Handler Returns form handler (aka form)
 	 */
-	protected function _getForgottenForm($resetRoute = null)
+	protected function _getForgottenForm($resetRoute = null, array $inputAttributes = array())
 	{
 		$form = $this->get('form');
 		$form->setAction($this->generateUrl('user.password.request.action'))
@@ -232,9 +233,13 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 			->setDefaultValues(array(
 				'reset_route' => $resetRoute
 			));
-		$form->add('email', 'text', 'Email address')
+
+		$form->add('email', 'text', 'Email address', array(
+			'attr' => (array_key_exists('email', $inputAttributes)) ? $inputAttributes['email'] : array(),
+		))
 			->val()
 			->email();
+
 		$form->add('reset_route', 'hidden');
 
 		return $form;
@@ -243,17 +248,18 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 	/**
 	 * Create form for password reset
 	 *
-	 * @param string $email                 User email for password reset
-	 * @param string $hash                  Hash sent to user to validate password reset
-	 * @param string | null $redirectURL    URL to redirect upon validation of form
+	 * @param string      $email           User email for password reset
+	 * @param string      $hash            Hash sent to user to validate password reset
+	 * @param string|null $redirectURL     URL to redirect upon validation of form
+	 * @param array       $inputAttributes Array of custom attributes for each input
 	 *
 	 * @return \Message\Cog\Form\Handler    Returns form handler (aka form)
 	 */
-	protected function _getResetForm($email, $hash, $redirectURL = null)
+	protected function _getResetForm($email, $hash, $redirectURL = null, array $inputAttributes = array())
 	{
 		$action = $this->generateUrl('user.password.reset.action', array(
 			'email' => $email,
-			'hash' => $hash,
+			'hash'  => $hash,
 		));
 
 		$form = $this->get('form');
@@ -263,8 +269,15 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 			->setDefaultValues(array(
 				'redirect' => $redirectURL
 			));
-		$form->add('password', 'password', 'New password');
-		$form->add('confirm', 'password', 'Confirm password');
+
+		$form->add('password', 'password', 'New password', array(
+			'attr' => (array_key_exists('email', $inputAttributes)) ? $inputAttributes['email'] : array(),
+		));
+
+		$form->add('confirm', 'password', 'Confirm password', array(
+			'attr' => (array_key_exists('confirm', $inputAttributes)) ? $inputAttributes['confirm'] : array(),
+		));
+
 		$form->add('redirect', 'hidden');
 
 		return $form;
