@@ -2,7 +2,7 @@
 
 namespace Message\User;
 
-use Message\Cog\DB\Query as DBQuery;
+use Message\Cog\DB;
 use Message\Cog\Event\DispatcherInterface;
 use Message\Cog\Security\Hash\HashInterface;
 use Message\Cog\ValueObject\DateTimeImmutable;
@@ -29,7 +29,7 @@ class Create
 	 * @param HashInterface       $hash            Hash to use for user passwords
 	 * @param User                $user            The currently logged in user
 	 */
-	public function __construct(DBQuery $query, DispatcherInterface $eventDispatcher,
+	public function __construct(DB\Query $query, DispatcherInterface $eventDispatcher,
 		HashInterface $hash, UserInterface $user)
 	{
 		$this->_query           = $query;
@@ -41,6 +41,11 @@ class Create
 	public function save(User $user)
 	{
 		return $this->create($user);
+	}
+
+	public function setTransaction(DB\Transaction $trans)
+	{
+		$this->_query = $trans;
 	}
 
 	public function create(User $user)
@@ -69,6 +74,10 @@ class Create
 				'created_at' => $user->authorship->createdAt(),
 			)
 		);
+
+		if ($this->_query instanceof DB\Transaction) {
+			return $user;
+		}
 
 		$user->id = $result->id();
 

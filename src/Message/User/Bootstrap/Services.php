@@ -70,6 +70,10 @@ class Services implements ServicesInterface
 			return new User\PermissionRegistry;
 		});
 
+		$services['user.register.form'] = $services->share(function($c) {
+			return new User\Form\Register($c);
+		});
+
 		// Add a templating global for the current user
 		$services['templating.globals'] = $services->share($services->extend('templating.globals', function($globals) {
 			$globals->set('user', function($services) {
