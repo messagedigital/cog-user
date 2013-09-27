@@ -271,7 +271,7 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 			));
 
 		$form->add('password', 'password', 'New password', array(
-			'attr' => (array_key_exists('email', $inputAttributes)) ? $inputAttributes['email'] : array(),
+			'attr' => (array_key_exists('password', $inputAttributes)) ? $inputAttributes['password'] : array(),
 		));
 
 		$form->add('confirm', 'password', 'Confirm password', array(
