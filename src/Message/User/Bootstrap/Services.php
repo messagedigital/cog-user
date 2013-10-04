@@ -47,7 +47,7 @@ class Services implements ServicesInterface
 		};
 
 		$services['user.password_hash'] = $services->share(function($c) {
-			return new \Message\Cog\Security\Hash\Bcrypt($c['security.salt']);
+			return new \Message\Cog\Security\Hash\Bcrypt($c['security.string-generator']);
 		});
 
 		$services['user.session_hash'] = $services->share(function($c) {

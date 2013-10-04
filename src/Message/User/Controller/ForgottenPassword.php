@@ -177,7 +177,7 @@ class ForgottenPassword extends \Message\Cog\Controller\Controller
 	 */
 	protected function _generateHash(User $user)
 	{
-		$hash = new \Message\Cog\Security\Hash\SHA1($this->_services['security.salt']);
+		$hash = new \Message\Cog\Security\Hash\SHA1($this->_services['security.string-generator']);
 
 		return $hash->encrypt(
 			implode('-', array(
