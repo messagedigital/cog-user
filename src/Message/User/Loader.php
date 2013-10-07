@@ -99,7 +99,8 @@ class Loader
 			WHERE
 				email LIKE :term?s OR
 				forename LIKE :term?s OR
-				surname LIKE :term?s
+				surname LIKE :term?s OR
+				CONCAT(forename," ",surname) LIKE :term?s
 		', array(
 			'term' => '%' . $term . '%'
 		));
