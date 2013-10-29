@@ -10,13 +10,15 @@ use Message\User\UserInterface;
 class Register extends Handler
 {
 
-	public function buildForm($action, $redirectURL, $titles = array())
+	public function buildForm($action, $redirectURL, $titles = array(), $data = array())
 	{
+		$data += array('redirect' => $redirectURL);
+
 		$this
 			->setName('register')
 			->setAction($action)
 			->setMethod('POST')
-			->setDefaultValues(array('redirect' => $redirectURL));
+			->setDefaultValues($data);
 		$this->add('title', 'choice', 'Title', array(
 			'choices' => $titles
 		));
