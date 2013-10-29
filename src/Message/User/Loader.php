@@ -91,6 +91,8 @@ class Loader
 
 	public function getBySearchTerm($term)
 	{
+		$term = str_replace(' ', '', $term);
+
 		$result = $this->_query->run('
 			SELECT
 				user_id
@@ -101,8 +103,8 @@ class Loader
 				email LIKE :term?s OR
 				forename LIKE :term?s OR
 				surname LIKE :term?s OR
-				CONCAT(forename," ",surname) LIKE :term?s OR
-				user_address.postcode LIKE :term?s
+				CONCAT(forename,surname) LIKE :term?sOR
+				replace(user_address.postcode,\' \',\'\') LIKE :term?s
 			GROUP BY user_id
 		', array(
 			'term' => '%' . $term . '%'
