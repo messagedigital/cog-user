@@ -190,8 +190,8 @@ class Edit
 	public function setGroups(User $user, array $groups)
 	{
 		// Check the user has an id
-		if (! $user->id) {
-			throw new InvalidArgumentException('User id %s is not valid', $user->id);
+		if (!$user->id) {
+			throw new InvalidArgumentException('Cannot edit a user with no ID');
 		}
 
 		// Get the groups from the collection, ensuring they are valid
@@ -206,6 +206,10 @@ class Edit
 			WHERE
 				user_id = ?i
 		', $user->id);
+
+		if (empty($groups)) {
+			return true;
+		}
 
 		// Add user to chosen groups
 		$insertQuery = '';
