@@ -75,7 +75,7 @@ class Services implements ServicesInterface
 		};
 
 		// Add a templating global for the current user
-		$services['templating.globals'] = $services->extend('templating.globals', function($globals) {
+		$services->extend('templating.globals', function($globals) {
 			$globals->set('user', function($services) {
 				if ($services['user.current'] instanceof User\AnonymousUser) {
 					return null;
