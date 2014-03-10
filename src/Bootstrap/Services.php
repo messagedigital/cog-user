@@ -10,9 +10,9 @@ class Services implements ServicesInterface
 {
 	public function registerServices($services)
 	{
-		$services['user'] = function() {
+		$services['user'] = $services->factory(function() {
 			return new User\User;
-		};
+		});
 
 		// Get the currently logged in user
 		$services['user.current'] = function($c) {
@@ -23,11 +23,11 @@ class Services implements ServicesInterface
 			return new User\AnonymousUser;
 		};
 
-		$services['user.loader'] = $services->share(function($c) {
+		$services['user.loader'] = $services->factory(function($c) {
 			return new User\Loader($c['db.query']);
 		});
 
-		$services['user.edit'] = function($c) {
+		$services['user.edit'] = $services->factory(function($c) {
 			return new User\Edit(
 				$c['db.query'],
 				$c['event.dispatcher'],
@@ -35,47 +35,47 @@ class Services implements ServicesInterface
 				$c['user.current'],
 				$c['user.groups']
 			);
-		};
+		});
 
-		$services['user.create'] = function($c) {
+		$services['user.create'] = $services->factory(function($c) {
 			return new User\Create(
 				$c['db.query'],
 				$c['event.dispatcher'],
 				$c['user.password_hash'],
 				$c['user.current']
 			);
-		};
-
-		$services['user.password_hash'] = $services->share(function($c) {
-			return new \Message\Cog\Security\Hash\Bcrypt($c['security.string-generator']);
 		});
 
-		$services['user.session_hash'] = $services->share(function($c) {
+		$services['user.password_hash'] = function($c) {
+			return new \Message\Cog\Security\Hash\Bcrypt($c['security.string-generator']);
+		};
+
+		$services['user.session_hash'] = function($c) {
 			return new User\SessionHash(
 				$c['security.hash'],
 				$c['user.loader'],
 				'aKDx213BZ8X25j8az34TRx'
 			);
-		});
-
-		$services['user.groups'] = $services->share(function() {
-			return new User\Group\Collection;
-		});
-
-		$services['user.group.loader'] = function($c) {
-			return new User\Group\Loader($c['user.groups'], $c['db.query']);
 		};
 
-		$services['user.permission.registry'] = $services->share(function() {
-			return new User\PermissionRegistry;
+		$services['user.groups'] = function() {
+			return new User\Group\Collection;
+		};
+
+		$services['user.group.loader'] = $services->factory(function($c) {
+			return new User\Group\Loader($c['user.groups'], $c['db.query']);
 		});
 
-		$services['user.register.form'] = $services->share(function($c) {
+		$services['user.permission.registry'] = function() {
+			return new User\PermissionRegistry;
+		};
+
+		$services['user.register.form'] = function($c) {
 			return new User\Form\Register($c);
-		});
+		};
 
 		// Add a templating global for the current user
-		$services['templating.globals'] = $services->share($services->extend('templating.globals', function($globals) {
+		$services->extend('templating.globals', function($globals) {
 			$globals->set('user', function($services) {
 				if ($services['user.current'] instanceof User\AnonymousUser) {
 					return null;
@@ -85,6 +85,6 @@ class Services implements ServicesInterface
 			});
 
 			return $globals;
-		}));
+		});
 	}
 }
