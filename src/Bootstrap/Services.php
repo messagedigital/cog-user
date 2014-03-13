@@ -15,13 +15,13 @@ class Services implements ServicesInterface
 		});
 
 		// Get the currently logged in user
-		$services['user.current'] = function($c) {
+		$services['user.current'] = $services->factory(function($c) {
 			if ($user = $c['http.session']->get($c['cfg']->user->sessionName)) {
 				return $user;
 			}
 
 			return new User\AnonymousUser;
-		};
+		});
 
 		$services['user.loader'] = $services->factory(function($c) {
 			return new User\Loader($c['db.query']);
