@@ -78,9 +78,9 @@ class Services implements ServicesInterface
 			return new User\Form\Register($c);
 		};
 
-		$services['user.form.search'] = function($c) {
-			return new User\Form\Search;
-		};
+		$services['user.form.simple_search'] = $services->factory(function($c) {
+			return new User\Form\SimpleSearch;
+		});
 
 		// Add a templating global for the current user
 		$services->extend('templating.globals', function($globals) {
