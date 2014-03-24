@@ -24,7 +24,7 @@ class Services implements ServicesInterface
 		});
 
 		$services['user.searcher'] = $services->factory(function($c) {
-			return new User\Searcher($c['db.query'], $c['user.loader'], 3);
+			return new User\Searcher($c['db.query'], $c['user.loader'], 2);
 		});
 
 		$services['user.loader'] = $services->factory(function($c) {
