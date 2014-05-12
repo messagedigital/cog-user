@@ -84,9 +84,32 @@ class Loader
 		return is_array($email) ? $return : array_shift($return);
 	}
 
-	public function getByGroup(Group\GroupInterface $group)
+	/**
+	 * Get all users in a specific group.
+	 *
+	 * @param  string|Group\GroupInterface $group Group or group name
+	 *
+	 * @return array[User]                        Users in the given group
+	 */
+	public function getByGroup($group)
 	{
+		if ($group instanceof Group\GroupInterface) {
+			$group = $group->getName();
+		}
 
+		$result = $this->_query->run('
+			SELECT
+				user_id
+			FROM
+				user_group
+			WHERE
+				group_name = ?s
+		', $group);
+
+		return array_filter(array_map(
+			array($this, '_load'),
+			$result->flatten('user_id')
+		));
 	}
 
 	public function getBySearchTerm($term)
