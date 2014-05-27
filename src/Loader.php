@@ -203,6 +203,9 @@ class Loader
 
 		$result->bind($user);
 
+		$user->id             = (int) $data->id;
+		$user->emailConfirmed = (boolean) $data->emailConfirmed;
+
 		if ($data->lastLoginAt) {
 			$user->lastLoginAt = new DateTimeImmutable(date('c', $data->lastLoginAt));
 		}
