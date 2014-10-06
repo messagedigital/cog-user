@@ -127,7 +127,8 @@ class Loader
 				forename LIKE :term?s OR
 				surname LIKE :term?s OR
 				CONCAT(forename,surname) LIKE :term?s OR
-				replace(user_address.postcode,\' \',\'\') LIKE :term?s
+				replace(user_address.postcode,\' \',\'\') LIKE :term?s OR
+				replace(user_address.town,\' \',\'\') LIKE :term?s
 			GROUP BY user_id
 		', array(
 			'term' => '%' . $term . '%'
@@ -201,6 +202,9 @@ class Loader
 		$data = $result->first();
 
 		$result->bind($user);
+
+		$user->id             = (int) $data->id;
+		$user->emailConfirmed = (boolean) $data->emailConfirmed;
 
 		if ($data->lastLoginAt) {
 			$user->lastLoginAt = new DateTimeImmutable(date('c', $data->lastLoginAt));
