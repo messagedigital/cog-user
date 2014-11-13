@@ -17,7 +17,7 @@ class Report extends EventListener implements SubscriberInterface
 	static public function getSubscribedEvents()
 	{
 		return array(
-			ReportEvents\ReportEvent::REGISTER_REPORTS => [
+			ReportEvents\Events::REGISTER_REPORTS => [
 				'registerReports'
 			],
 		);

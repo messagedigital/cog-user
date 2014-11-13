@@ -37,7 +37,6 @@ class UserSummary extends AbstractReport
 	public function getColumns()
 	{
 		$columns = [
-			['type' => 'number', 	'name' => "ID",			],
 			['type' => 'string',	'name' => "Name",		],
 			['type' => 'string',	'name' => "Email",		],
 			['type' => 'number',	'name' => "Created",	],
@@ -53,20 +52,18 @@ class UserSummary extends AbstractReport
 		$queryBuilder
 			->select('user.user_id AS "ID"')
 			->select('created_at AS "Created"')
-			->select('CONCAT(forename, " ",surname) AS "Name"')
+			->select('CONCAT(surname,", ",forename) AS "User"')
 			->select('email AS "Email"')
 			->from('user')
-			->leftJoin("user_group","user.user_id = user_group.user_id",
-				$this->_builderFactory->getQueryBuilder()
-					->select('user_id')
-					->select('GROUP_CONCAT(group_name) AS "group"')
-					->from('user_group')
-					->groupBy('user_id')
-				)
-			->orderBy('user.user_id')
+			// ->leftJoin("user_group","user.user_id = user_group.user_id",
+			// 	$this->_builderFactory->getQueryBuilder()
+			// 		->select('user_id')
+			// 		->select('GROUP_CONCAT(group_name) AS "group"')
+			// 		->from('user_group')
+			// 		->groupBy('user_id')
+			// 	)
+			->orderBy('surname')
 		;
-
-		de($queryBuilder->getQueryString());
 
 		return $queryBuilder->getQuery();
 	}
@@ -78,8 +75,7 @@ class UserSummary extends AbstractReport
 		foreach ($data as $row) {
 
 			$result[] = [
-				$row->ID,
-				$row->Name,
+				$row->User ? [ 'v' => utf8_encode($row->User), 'f' => (string) '<a href ="'.$this->generateUrl('ms.cp.user.admin.detail.edit', ['userID' => $row->ID]).'">'.ucwords(utf8_encode($row->User)).'</a>' ] : $row->User,
 				$row->Email,
 				[ 'v' => $row->Created, 'f' => date('Y-m-d H:i', $row->Created)],
 			];
