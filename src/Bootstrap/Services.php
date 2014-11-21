@@ -95,7 +95,11 @@ class Services implements ServicesInterface
 	public function registerReports($services)
 	{
 		$services['user.user_summary'] = $services->factory(function($c) {
-			return new User\Report\UserSummary($c['db.query.builder.factory'],$c['translator'],$c['routing.generator']);
+			return new User\Report\UserSummary(
+				$c['db.query.builder.factory'],
+				$c['translator'],
+				$c['routing.generator']
+			);
 		});
 
 		$services['user.reports'] = function($c) {
