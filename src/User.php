@@ -18,6 +18,7 @@ class User implements UserInterface
 	public $id;
 	public $email;
 	public $emailConfirmed;
+	public $password;
 	public $authorship;
 
 	public $title;
