@@ -4,7 +4,6 @@ namespace Message\User\Report;
 
 use Message\Cog\DB\QueryBuilderInterface;
 use Message\Cog\DB\QueryBuilderFactory;
-use Message\Cog\Localisation\Translator;
 use Message\Cog\Routing\UrlGenerator;
 
 use Message\Mothership\Report\Report\AbstractReport;
@@ -12,19 +11,31 @@ use Message\Mothership\Report\Chart\TableChart;
 
 class UserSummary extends AbstractReport
 {
-	public function __construct(QueryBuilderFactory $builderFactory, Translator $trans, UrlGenerator $routingGenerator)
+	/**
+	 * Constructor.
+	 *
+	 * @param QueryBuilderFactory   $builderFactory
+	 * @param UrlGenerator          $routingGenerator
+	 */
+	public function __construct(QueryBuilderFactory $builderFactory, UrlGenerator $routingGenerator)
 	{
+		parent::__construct($builderFactory, $routingGenerator);
 		$this->name = 'user_summary';
 		$this->displayName = 'User Summary';
 		$this->reportGroup = 'Users';
 		$this->_charts = [new TableChart];
-		parent::__construct($builderFactory,$trans,$routingGenerator);
 	}
 
+	/**
+	 * Retrieves JSON representation of the data and columns.
+	 * Applies data to chart types set on report.
+	 *
+	 * @return Array  Returns all types of chart set on report with appropriate data.
+	 */
 	public function getCharts()
 	{
-		$data = $this->_dataTransform($this->_getQuery()->run());
-		$columns = $this->getColumns();
+		$data = $this->_dataTransform($this->_getQuery()->run(), "json");
+		$columns = $this->_parseColumns($this->getColumns());
 
 		foreach ($this->_charts as $chart) {
 			$chart->setColumns($columns);
@@ -34,18 +45,26 @@ class UserSummary extends AbstractReport
 		return $this->_charts;
 	}
 
+	/**
+	 * Set columns for use in reports.
+	 *
+	 * @return array  Returns array of columns as keys with format for Google Charts as the value.
+	 */
 	public function getColumns()
 	{
-		$columns = [
-			['type' => 'string',	'name' => "Name",		],
-			['type' => 'string',	'name' => "Email",		],
-			['type' => 'number',	'name' => "Created",	],
+		return [
+			'Name'    => 'string',
+			'Email'   => 'string',
+			'Created' => 'number',
 		];
-
-		return json_encode($columns);
 	}
 
-	private function _getQuery()
+	/**
+	 * Gets all user data.
+	 *
+	 * @return Query
+	 */
+	protected function _getQuery()
 	{
 		$queryBuilder = $this->_builderFactory->getQueryBuilder();
 
@@ -55,33 +74,48 @@ class UserSummary extends AbstractReport
 			->select('CONCAT(surname,", ",forename) AS "User"')
 			->select('email AS "Email"')
 			->from('user')
-			// ->leftJoin("user_group","user.user_id = user_group.user_id",
-			// 	$this->_builderFactory->getQueryBuilder()
-			// 		->select('user_id')
-			// 		->select('GROUP_CONCAT(group_name) AS "group"')
-			// 		->from('user_group')
-			// 		->groupBy('user_id')
-			// 	)
 			->orderBy('surname')
 		;
 
 		return $queryBuilder->getQuery();
 	}
 
-	private function _dataTransform($data)
+	/**
+	 * Takes the data and transforms it into a useable format.
+	 *
+	 * @param  $data    DB\Result  The data from the report query.
+	 * @param  $output  String     The type of output required.
+	 *
+	 * @return String|Array  Returns columns as string in JSON format or array.
+	 */
+	protected function _dataTransform($data, $output = null)
 	{
 		$result = [];
 
-		foreach ($data as $row) {
+		if ($output === "json") {
 
-			$result[] = [
-				$row->User ? [ 'v' => utf8_encode($row->User), 'f' => (string) '<a href ="'.$this->generateUrl('ms.cp.user.admin.detail.edit', ['userID' => $row->ID]).'">'.ucwords(utf8_encode($row->User)).'</a>' ] : $row->User,
-				$row->Email,
-				[ 'v' => $row->Created, 'f' => date('Y-m-d H:i', $row->Created)],
-			];
+			foreach ($data as $row) {
+
+				$result[] = [
+					$row->User ? [ 'v' => utf8_encode($row->User), 'f' => (string) '<a href ="'.$this->generateUrl('ms.cp.user.admin.detail.edit', ['userID' => $row->ID]).'">'.ucwords(utf8_encode($row->User)).'</a>' ] : $row->User,
+					$row->Email,
+					[ 'v' => $row->Created, 'f' => date('Y-m-d H:i', $row->Created)],
+				];
+
+			}
+			return json_encode($result);
+
+		} else {
+
+			foreach ($data as $row) {
+				$result[] = [
+					utf8_encode($row->User),
+					$row->Email,
+					date('Y-m-d H:i', $row->Created),
+				];
+			}
+			return $result;
 
 		}
-
-		return json_encode($result);
 	}
 }
