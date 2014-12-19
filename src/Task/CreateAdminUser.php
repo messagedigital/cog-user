@@ -1,6 +1,6 @@
 <?php
 
-namespace Message\User\Tasks;
+namespace Message\User\Task;
 
 use Message\User\User;
 use Message\Cog\Console\Task\Task;
@@ -15,8 +15,6 @@ class CreateAdminUser extends Task
 		'email',
 		'password',
 	];
-
-	private $_user;
 
 	public function process()
 	{
