@@ -27,6 +27,10 @@ class Services implements ServicesInterface
 			return new User\AnonymousUser;
 		});
 
+		$services['user.searcher'] = $services->factory(function($c) {
+			return new User\Searcher($c['db.query'], $c['user.loader'], 2);
+		});
+
 		$services['user.loader'] = $services->factory(function($c) {
 			return new User\Loader($c['db.query']);
 		});
@@ -77,6 +81,10 @@ class Services implements ServicesInterface
 		$services['user.register.form'] = function($c) {
 			return new User\Form\Register($c);
 		};
+
+		$services['user.form.simple_search'] = $services->factory(function($c) {
+			return new User\Form\SimpleSearch;
+		});
 
 		// Add a templating global for the current user
 		$services->extend('templating.globals', function($globals) {
