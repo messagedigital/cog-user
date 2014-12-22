@@ -20,9 +20,9 @@ class UserSummary extends AbstractReport
 	public function __construct(QueryBuilderFactory $builderFactory, UrlGenerator $routingGenerator)
 	{
 		parent::__construct($builderFactory, $routingGenerator);
-		$this->name = 'user_summary';
-		$this->displayName = 'User Summary';
-		$this->reportGroup = 'Users';
+		$this->_setName('user_summary');
+		$this->_setDisplayName('User Summary');
+		$this->_setReportGroup('Users');
 		$this->_charts = [new TableChart];
 	}
 
