@@ -67,8 +67,10 @@ class Loader
 			FROM
 				user_group
 			WHERE
-				user_id = ?i
-		', $user->id);
+				user_id = :userID?i
+		', [
+			'userID' => $user->id,
+		]);
 
 		foreach ($result->flatten('group_name') as $group) {
 			$return[$group] = $this->_load($group);
