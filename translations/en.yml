@@ -1,0 +1,9 @@
+cog.user:
+  user:
+    title: Title
+    firstname: Forename
+    lastname: Surname
+    email: Email
+    password:
+      password: Password
+      confirm: Confirm Password
