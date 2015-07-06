@@ -57,21 +57,25 @@ class Create
 			'INSERT INTO
 				user
 			SET
-				email      = :email?s,
-				forename   = :forename?s,
-				surname    = :surname?s,
-				title      = :title?s,
-				password   = :password?s,
-				created_by = :created_by?i,
-				created_at = :created_at?i
+				email       = :email?s,
+				forename    = :forename?s,
+				surname     = :surname?s,
+				description = :description?sn,
+				job_title   = :jobTitle?sn,
+				title       = :title?s,
+				password    = :password?s,
+				created_by  = :created_by?i,
+				created_at  = :created_at?i
 			', array(
-				'email'      => $user->email,
-				'forename'   => $user->forename,
-				'surname'    => $user->surname,
-				'title'      => $user->title,
-				'password'   => $user->password,
-				'created_by' => $user->authorship->createdBy(),
-				'created_at' => $user->authorship->createdAt(),
+				'email'       => $user->email,
+				'forename'    => $user->forename,
+				'surname'     => $user->surname,
+				'description' => $user->description,
+				'jobTitle'    => $user->jobTitle,
+				'title'       => $user->title,
+				'password'    => $user->password,
+				'created_by'  => $user->authorship->createdBy(),
+				'created_at'  => $user->authorship->createdAt(),
 			)
 		);
 

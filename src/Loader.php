@@ -186,6 +186,8 @@ class Loader
 				title,
 				forename,
 				surname,
+				description,
+				job_title           AS jobTitle,
 				last_login_at       AS lastLoginAt,
 				password_request_at AS passwordRequestAt
 			FROM

@@ -2,7 +2,7 @@
 
 use Message\Cog\Migration\Adapter\MySQL\Migration;
 
-class _1436193244_AddDescriptionField extends Migration
+class _1436193244_AddDescriptionAndJobFields extends Migration
 {
 	public function up()
 	{
@@ -14,6 +14,15 @@ class _1436193244_AddDescriptionField extends Migration
 			AFTER
 				`surname`
 		");
+
+		$this->run("
+			ALTER TABLE
+				`user`
+			ADD COLUMN
+				`job_title` VARCHAR(255) DEFAULT NULL
+			AFTER
+				`description`
+		");
 	}
 
 	public function down()
@@ -23,6 +32,13 @@ class _1436193244_AddDescriptionField extends Migration
 				`user`
 			DROP
 				`description`
+		");
+
+		$this->run("
+			ALTER TABLE
+				`user`
+			DROP
+				`job_title`
 		");
 	}
 }
