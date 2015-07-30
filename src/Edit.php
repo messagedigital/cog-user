@@ -62,22 +62,26 @@ class Edit
 			UPDATE
 				user
 			SET
-				title 	   = :title?s,
-				forename   = :forename?s,
-				surname    = :surname?s,
-				email      = :email?s,
-				updated_at = :updatedAt?d,
-				updated_by = :updatedBy?in
+				title 	    = :title?s,
+				forename    = :forename?s,
+				surname     = :surname?s,
+				description = :description?sn,
+				job_title   = :jobTitle?sn,
+				email       = :email?s,
+				updated_at  = :updatedAt?d,
+				updated_by  = :updatedBy?in
 			WHERE
 				user_id = :userID?i
 		', array(
-			'userID'	=> $user->id,
-			'title' 	=> $user->title,
-			'forename'	=> $user->forename,
-			'surname'	=> $user->surname,
-			'email'		=> $user->email,
-			'updatedAt'	=> $user->authorship->updatedAt(),
-			'updatedBy'	=> $user->authorship->updatedBy(),
+			'userID'	  => $user->id,
+			'title' 	  => $user->title,
+			'forename'	  => $user->forename,
+			'surname'	  => $user->surname,
+			'description' => $user->description,
+			'jobTitle'    => $user->jobTitle,
+			'email'		  => $user->email,
+			'updatedAt'	  => $user->authorship->updatedAt(),
+			'updatedBy'	  => $user->authorship->updatedBy(),
 		));
 
 		$event = new Event\Event($user);
