@@ -81,6 +81,11 @@ class Create
 
 		$user->id = $result->id();
 
+		$this->_eventDispatcher->dispatch(
+			Event\Event::CREATE,
+			new Event\Event($user)
+		);
+
 		return $user;
 	}
 }
