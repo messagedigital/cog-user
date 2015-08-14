@@ -156,10 +156,6 @@ class Authentication extends \Message\Cog\Controller\Controller
 			'attr' => (array_key_exists('redirect', $inputAttributes)) ? $inputAttributes['redirect'] : array(),
 		));
 
-		$handler->add('remember', 'checkbox', 'Keep me logged in', array(
-			'attr' => (array_key_exists('remember', $inputAttributes)) ? $inputAttributes['remember'] : array(),
-		))->val()->optional();
-
 		return $handler;
 	}
 }
