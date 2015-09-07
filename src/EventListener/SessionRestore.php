@@ -2,6 +2,7 @@
 
 namespace Message\User\EventListener;
 
+use Message\User;
 use Message\Cog\HTTP\Cookie;
 use Message\Cog\Event\EventListener;
 use Message\Cog\Event\SubscriberInterface;
@@ -39,7 +40,7 @@ class SessionRestore extends EventListener implements SubscriberInterface
 	public function restoreSessionFromCookie(GetResponseEvent $event)
 	{
 		// Skip this if there is already a user logged in
-		if (!($this->_services['user.current'] instanceof AnonymousUser)) {
+		if (!($this->_services['user.current'] instanceof User\AnonymousUser)) {
 			return false;
 		}
 
@@ -47,7 +48,7 @@ class SessionRestore extends EventListener implements SubscriberInterface
 			$user = $this->_services['user.session_hash']->getUserFromHash($cookie);
 
 			// If the hash is invalid, clear the cookie
-			if (!$user) {
+			if (!$user instanceof User\User) {
 				$this->_services['http.cookies']->add(new Cookie(
 					$this->_services['cfg']->user->cookieName,
 					null,
@@ -57,7 +58,7 @@ class SessionRestore extends EventListener implements SubscriberInterface
 				return false;
 			}
 
-			// Othrwise, set the user session
+			// Otherwise, set the user session
 			$this->_services['http.session']->set($this->_services['cfg']->user->sessionName, $user);
 
 			return true;
