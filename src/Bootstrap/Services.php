@@ -16,7 +16,8 @@ class Services implements ServicesInterface
 
 		// Get the currently logged in user
 		$services['user.current'] = $services->factory(function($c) {
-			if ($user = $c['http.session']->get($c['cfg']->user->sessionName)) {
+			$user = $c['http.session']->get($c['cfg']->user->sessionName);
+			if ($user instanceof User\UserInterface) {
 				return $user;
 			}
 
