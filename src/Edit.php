@@ -82,6 +82,12 @@ class Edit
 
 		$event = new Event\Event($user);
 
+		// pass an event to the dispatcher so we can do any cleanup, etc.
+		$this->_eventDispatcher->dispatch(
+			Event\Event::EDIT,
+			$event
+		);
+
 		return $event->getUser();
 	}
 
