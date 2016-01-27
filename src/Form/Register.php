@@ -19,9 +19,11 @@ class Register extends Handler
 			->setAction($action)
 			->setMethod('POST')
 			->setDefaultValues($data);
+
 		$this->add('title', 'choice', $translator->trans('cog.user.user.title'), array(
 			'choices' => $titles
 		));
+
 		$this->add('forename', 'text', $translator->trans('cog.user.user.firstname'));
 		$this->add('surname', 'text', $translator->trans('cog.user.user.lastname'));
 		$this->add('email', 'email', $translator->trans('cog.user.user.email'));
