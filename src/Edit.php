@@ -195,9 +195,15 @@ class Edit
 		}
 
 		// Get the groups from the collection, ensuring they are valid
-		foreach ($groups as $i => $groupName) {
-			$groups[$i] = $this->_groups->get($groupName);
-		}
+		array_walk($groups, function (&$group) {
+			if (is_string($group)) {
+				$group = $this->_groups->get($group);
+			}
+
+			if (!$group instanceof Group\GroupInterface) {
+				throw new \LogicException('All groups in array should be a string or an instance of `GroupInterface`');
+			}
+		});
 
 		// Remove user from all groups
 		$this->_query->run('
