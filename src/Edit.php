@@ -201,7 +201,7 @@ class Edit
 			}
 
 			if (!$group instanceof Group\GroupInterface) {
-				throw new \LogicException('All groups in array should be a string or an instance of `GroupInterface`');
+				throw new \LogicException('All groups in array should be a group name or an instance of `GroupInterface`');
 			}
 		});
 
