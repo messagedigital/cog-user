@@ -129,7 +129,7 @@ class Edit
 	 * Add a user to a group.
 	 *
 	 * @param User                $user
-	 * @param GroupGroupInterface $group
+	 * @param Group\GroupInterface $group
 	 *
 	 * @return bool
 	 */
@@ -194,10 +194,18 @@ class Edit
 			throw new InvalidArgumentException('Cannot edit a user with no ID');
 		}
 
-		// Get the groups from the collection, ensuring they are valid
-		foreach ($groups as $i => $groupName) {
-			$groups[$i] = $this->_groups->get($groupName);
+		$groupObjects = [];
+
+		foreach ($groups as $group) {
+			$group = is_string($group) ? $this->_groups->get($group) : $group;
+			if (!$group instanceof Group\GroupInterface) {
+				throw new \LogicException('All groups in array should be a group name or an instance of `GroupInterface`');
+			}
+
+			$groupObjects[$group->getName()] = $group;
 		}
+
+		$groups = $groupObjects;
 
 		// Remove user from all groups
 		$this->_query->run('
@@ -220,7 +228,6 @@ class Edit
 			$insertValues[] = $group->getName();
 		}
 		$insertQuery = substr($insertQuery, 0, -1);
-
 		$this->_query->run('
 			INSERT INTO
 				user_group (`user_id`, `group_name`)
