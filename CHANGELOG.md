@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.1.0
+
+- `Edit::setGroups()` can take an array of `GroupInterface` instances as well as string representations of groups (i.e. group names)
+- `Edit::setGroups()` will throw a `LogicException` if a variable in te array is neither a string nor an instance of `GroupInterface`
+- Added missing `$password` property to `User` object
+
 ## 2.0.3
 
 - Check user in session is an instance of `User\UserInterface` before returning via the service container
