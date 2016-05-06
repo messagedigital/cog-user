@@ -23,6 +23,7 @@ class User implements UserInterface
 	public $title;
 	public $forename;
 	public $surname;
+	public $password;
 
 	public $lastLoginAt;
 	public $passwordRequestAt;
