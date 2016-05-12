@@ -70,7 +70,7 @@ class Edit
 				updated_by = :updatedBy?in
 			WHERE
 				user_id = :userID?i
-		', array(
+		', [
 			'userID'	=> $user->id,
 			'title' 	=> $user->title,
 			'forename'	=> $user->forename,
@@ -78,11 +78,37 @@ class Edit
 			'email'		=> $user->email,
 			'updatedAt'	=> $user->authorship->updatedAt(),
 			'updatedBy'	=> $user->authorship->updatedBy(),
-		));
+		]);
 
 		$event = new Event\Event($user);
 
 		return $event->getUser();
+	}
+
+	/**
+	 * Set a user to deleted
+	 *
+	 * @param  User   $user        The user to change the details for
+	 *
+	 * @author Grace Cooper
+	 */
+	public function delete(User $user)
+	{
+		$user->authorship->update(new DateTimeImmutable, $this->_currentUser->id);
+
+		$result = $this->_query->run('
+			UPDATE
+				user
+			SET
+				deleted_at = :updatedAt?d,
+				deleted_by = :updatedBy?in
+			WHERE
+				user_id = :userID?i
+		', [
+			'userID'	=> $user->id,
+			'updatedAt'	=> $user->authorship->updatedAt(),
+			'updatedBy'	=> $user->authorship->updatedBy(),
+		]);
 	}
 
 	/**
