@@ -86,32 +86,6 @@ class Edit
 	}
 
 	/**
-	 * Set a user to deleted
-	 *
-	 * @param  User   $user        The user to change the details for
-	 *
-	 * @author Grace Cooper
-	 */
-	public function delete(User $user)
-	{
-		$user->authorship->update(new DateTimeImmutable, $this->_currentUser->id);
-
-		$result = $this->_query->run('
-			UPDATE
-				user
-			SET
-				deleted_at = :updatedAt?d,
-				deleted_by = :updatedBy?in
-			WHERE
-				user_id = :userID?i
-		', [
-			'userID'	=> $user->id,
-			'updatedAt'	=> $user->authorship->updatedAt(),
-			'updatedBy'	=> $user->authorship->updatedBy(),
-		]);
-	}
-
-	/**
 	 * Change the password for a given user.
 	 *
 	 * @param  User   $user        The user to change the password for
