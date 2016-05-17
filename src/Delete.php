@@ -14,13 +14,13 @@ class Delete
 {
 	private $_transaction;
 	private $_transOverride = false;
-	protected $_currentUser;
+	private $_currentUser;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param DBTransaction $transaction
-	 * @param DBQuery             $query           The database query instance to use
+	 * @param DB\Transaction $transaction
+	 * @param DB\Query             $query           The database query instance to use
 	 * @param User                $user            The currently logged in user
 	 */
 	public function __construct(
@@ -52,7 +52,7 @@ class Delete
 	 */
 	private function _delete(User $user)
 	{
-		$user->authorship->update(new DateTimeImmutable, $this->_currentUser->id);
+		$user->authorship->delete(null, $this->_currentUser->id);
 
 		$result = $this->_transaction->add('
 			UPDATE
@@ -64,8 +64,8 @@ class Delete
 				user_id = :userID?i
 		', [
 			'userID'	=> $user->id,
-			'updatedAt'	=> $user->authorship->updatedAt(),
-			'updatedBy'	=> $user->authorship->updatedBy(),
+			'updatedAt'	=> $user->authorship->deletedAt(),
+			'updatedBy'	=> $user->authorship->deletedBy(),
 		]);
 	}
 
