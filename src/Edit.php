@@ -70,7 +70,7 @@ class Edit
 				updated_by = :updatedBy?in
 			WHERE
 				user_id = :userID?i
-		', array(
+		', [
 			'userID'	=> $user->id,
 			'title' 	=> $user->title,
 			'forename'	=> $user->forename,
@@ -78,7 +78,7 @@ class Edit
 			'email'		=> $user->email,
 			'updatedAt'	=> $user->authorship->updatedAt(),
 			'updatedBy'	=> $user->authorship->updatedBy(),
-		));
+		]);
 
 		$event = new Event\Event($user);
 

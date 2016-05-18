@@ -42,6 +42,13 @@ class Services implements ServicesInterface
 			);
 		});
 
+		$services['user.delete'] = $services->factory(function($c){
+			return new User\Delete(
+				$c['db.transaction'],
+				$c['user.current']
+			);
+		});
+
 		$services['user.create'] = $services->factory(function($c) {
 			return new User\Create(
 				$c['db.query'],
