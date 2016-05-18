@@ -52,7 +52,7 @@ class Delete
 	 */
 	private function _delete(User $user)
 	{
-		$user->authorship->delete(null, $this->_currentUser->id);
+		$user->authorship->delete(null, $this->_currentUser);
 
 		$result = $this->_transaction->add('
 			UPDATE
@@ -65,7 +65,7 @@ class Delete
 		', [
 			'userID'	=> $user->id,
 			'updatedAt'	=> $user->authorship->deletedAt(),
-			'updatedBy'	=> $user->authorship->deletedBy(),
+			'updatedBy'	=> $user->authorship->deletedBy()->id,
 		]);
 	}
 
