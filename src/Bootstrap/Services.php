@@ -63,6 +63,10 @@ class Services implements ServicesInterface
 			);
 		};
 
+		$services['title.list'] = function($c) {
+			return array_combine($c['cfg']->titles->en, $c['cfg']->titles->en);
+		};
+
 		$services['user.groups'] = function() {
 			return new User\Group\Collection;
 		};
