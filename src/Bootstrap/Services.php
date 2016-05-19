@@ -63,6 +63,7 @@ class Services implements ServicesInterface
 			);
 		};
 
+		// @TODO Make this dynamic based on language code
 		$services['title.list'] = function($c) {
 			return array_combine($c['cfg']->titles->en, $c['cfg']->titles->en);
 		};
