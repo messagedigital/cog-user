@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.2.0
+
+- Make users deletable
+- Add `User\Delete` class for deleting users
+- Add `user.delete` service which returns instance of `User\Delete`
+- Add `deleted_by` and `deleted_at` columns to `user` table
+
 ## 2.1.0
 
 - `Edit::setGroups()` can take an array of `GroupInterface` instances as well as string representations of groups (i.e. group names)
